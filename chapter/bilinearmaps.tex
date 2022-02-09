@@ -1,0 +1,209 @@
+\chapter{Pairing-Based Cryptography}
+Questo tipo di approccio crittografico utilizza lo strumento matematico delle \textbf{mappe bilineari} per trasformare punti di due gruppi crittografici in punti di un altro gruppo tramite una specifica funzione. E' un approccio potente, perché permette ad esempio di ridurre un problema difficile in un gruppo ad un problema più facile da risolvere su un altro gruppo.\\
+Questo campo di ricerca venne lanciato da Boneh e Franklin nel 2001, nel tentativo di creare uno schema di verifica dell'identità \textbf{senza} fare uso dei certificati.
+\section{Bilinear Maps}
+Diamo una definizione di una Mappa Bilineare:
+\begin{definition}[Bilinear Map]\label{def:bilmap}
+Siano $G_1,G_2,G_t$ gruppi \textbf{ciclici} dello \textbf{stesso ordine}. Allora, una mappa bilineare da $G_1\times G_2$ è una funzione $e$ tale che:
+\begin{equation}
+    \begin{aligned}
+    e:G_1\times G_2\longrightarrow G_t\,:\, &\forall u\in{G_1}\, v\in{G_2},\,a,b\in{\mathbb{Z}}\,\text{s.t.:}\\
+    e(u^a,v^b)&=e(u,v)^{ab}
+    \end{aligned}
+\end{equation}
+\end{definition}
+\begin{remark}
+Le mappe bilineari sono chiamate \textbf{pairings} (accoppiamenti) poiché associano coppie di elementi da $G_1$ e $G_2$ con elementi di $G_t$.
+\end{remark}
+\begin{note}La \cref{def:bilmap} ammette anche mappe \textbf{degeneri}, ovvero che mappano tutto nell'identità di $G_t$.
+\end{note}
+Dobbiamo pertanto dare una seconda definizione, che ci dica se una mappa è utilizzabile per i nostri scopi:
+\begin{definition}[Admissible Bilinear Map]\label{def:admbil}
+Sia $e:G_1\times G_2\longrightarrow G_t$ una mappa bilineare e siano $g_1,g_2$ i \textbf{generatori} di $G_1,G_2$ rispettivamente.\\
+La mappa $e$ è \textbf{una mappa bilineare ammissibile} se $e(g_1,g_2)$ \textbf{genera} $G_t$ ed è \textbf{calcolabile in modo efficiente}.
+\end{definition}
+\begin{note}
+A volte questo tipo di mappe vengono denominate con $\hat{e}$, ma noi continueremo ad usare $e$.
+\end{note}
+\begin{remark}
+Da questo momento in poi, ogni volta che useremo una mappa si intenderà che è una mappa ammissibile.
+\end{remark}
+Tipicamente, negli schemi crittografici i gruppi $G_1.G_2$ vengono presi uguali, per questo da ora in poi faremo questa assunzione. Inoltre, l'ordine è solitamente un numero primo (la differenza sta nel modo in cui i gruppi funzionano e vengono usati).\\
+\begin{remark}
+Idealmente vorremmo anche cercare una mappa che trasformi $G\times G\longrightarrow G$, ma non ci sono studi in merito e non consideriamo questo caso.
+\end{remark}
+\begin{note}
+Le mappe bilineari tipicamente usate sono quelle di \textbf{Weil} e \textbf{Tate}, estremamente complicate ma non necessitano di essere capite per essere usate.
+\end{note}
+Il concetto fondamentale sulle mappe bilineari è come queste influenzano il \textbf{Decisional Diffie-Hellman Problem}:
+\begin{definition}[Decisional Diffie-Hellman Problem]\label{def:ddh}
+Dati $g,g^a,g^b$ e un valore $\alpha$ che con probabilità $1/2$ assume il valore $g^{ab}$ oppure $g^z$, dove $z$ è un numero intero casuale. Indovinare qual è il valore di $\alpha$.\\
+Diremo che un DDH-problem è \textbf{hard}, se senza alcuno strumento la probabilità di indovinare è negligible.
+\end{definition}
+\begin{note}
+Se un attaccante fosse in grado di calcolare $g^{ab}$, ovvero è in grado di \textbf{rompere computational DH} (CDH), allora anche DDH viene rotto. Il viceversa potrebbe non essere vero.
+\end{note}
+\begin{example}[ How pairing breaks DDH]
+Supponiamo che un attaccante disponga di $g,g^a,g^b$, che corrispondono a tre punti di una curva ellittica. Avendo a disposizione un pairing del tipo $e(g^a,g^b)=e(g,g)^{ab}=g_t^{ab}$\footnotemark \,che mappa due punti di una curva su un intero modulare, allora DDH è rotto, perché basta controllare che un valore $\alpha=\{g^{ab},g^{z}\}$ abbia lo stesso pairing, ovvero: 
+\[
+e(g,\alpha)=\begin{cases}
+e(g,g^{ab})=g^{1\cdot ab}_t&p=\frac{1}{2}\\
+e(g,g^z)=g^z_t&p=\frac{1}{2}
+\end{cases}
+\]
+\begin{note}
+E' importante osservare che \textbf{non è stato calcolato} il valore di $g^{ab}$, ma è stato calcolato $g_t^{ab}$ perché il primo è un punto di una EC, il secondo di $Z_p^*$.
+\end{note}
+\end{example}
+\begin{remark}
+L'esempio ci mostra come non è possibile rompere DDH nuovamente, poiché una volta fatto il primo pairing non siamo più in EC e non possiamo tornare indietro.
+\end{remark}
+\footnotetext{E' stata usata la notazione moltiplicativa per il calcolo, dove $\alpha*P=P^\alpha$.}
+\subsection{MOV Reduction}
+Ricordiamo il vantaggio di usare le curve ellittiche:
+\begin{property}Se stiamo usando come gruppo $Z^*_P$ per gli algoritmi di cifratura, DH o per risolvere Dlog, allora le \textbf{chiavi} hanno \textbf{dimensione} di 2048bit. Se usiamo \textbf{curve ellittiche}, possiamo \textbf{ridurre} la dimensione a \textbf{256bit}.  
+\end{property}
+Supponiamo adesso di voler risolvere un Dlog-problem in un gruppo basato su $EC$. Un dealer ci consegna il generatore $g$ e il risultato di $g^x$. Supponiamo che su questo gruppo $G$ il problema sia difficile perché la chiave usata è a 256bit. \\
+Supponendo però di avere a disposizione $e:G\times G\longrightarrow G_t=Z_p^*$ con key-size di 256bit, possiamo calcolare:
+\[e(g,g^x)=e(g,g)^x=g^x_t\]
+E portare il problema su un gruppo più debole.\\
+Questo problema è chiamato la \textbf{MOV Reduction} ed è \textbf{lo strumento principale} per rompere l'EC-crypto. 
+\begin{problem}[3-party DH] Consideriamo uno scenario di key-agreement nel quale tre entità voglio stabilire una chiave comune, dove:
+$P_1,P_2,P_3$ hanno a disposizione le coppie $(x,g^x),(y,g^y),(z,g^z)$ (supponendo che il generatore $g$ sia stato precedentemente accordato).
+\begin{note}
+Con schemi crittografici standard non possiamo risolvere il problema.
+\end{note}
+Nel 2000, un crittografo francese chiamato Joux, trovò una soluzione applicando tecniche di pairing:
+\begin{solution}
+\begin{theorem}[Joux's 3-party DH]\label{thm:dh3}
+Siano $X,Y,Z$ tre entità che effettuano un key-agreement, rispettivamente con  $(x,g^x),(y,g^y),(z,g^z)$. Allora:
+\begin{enumerate}
+    \item Ogni parte scambia la sua chiave pubblica con le altre due.
+    \item Ogni parte calcola $(g^i)^j=g^{ij}$, $i$ è la chiave della parte $i-esima$, $j$ una delle altre due.
+    \item Successivamente tremite pairing: $e(g^{ij},g^k)=e(g,g)^{ijk}=g_t^{ijk}$, $k$ è la chiave restante.
+\end{enumerate}
+\begin{remark}
+Poiché, tipicamente, $g\in{EC(\cdot)},g_t\in{Z_p^*}$, avremmo potuto anche calcolare \textbf{prima il pairing e poi la potenza}, guadagnando a livello di tempo computazionale:
+\begin{enumerate}
+    \item $e(g^x,g^y)=g_t^{xy}$.
+    \item $w=(g_t^{xy})^z$.
+\end{enumerate}
+\end{remark}
+\end{theorem}
+\end{solution}
+\begin{note}
+E' \textbf{fondamentale} notare che avendo eseguito un pairing, il gruppo d'arrivo non è quello di partenza in cui vengono calcolate le chiavi pubbliche, quindi abbiamo potuto "barare" una e una sola volta con DH. Questo significa che non è possibile eseguire uno schema a 4-parti.
+\end{note}
+\end{problem}
+\section{Identity Based Encryption}
+\begin{problem}
+Vogliamo costruire un sistema crittografico a public-key dove la $pk$ è un \textbf{nome} (una stringa leggibile).
+\end{problem}
+\begin{note}
+Proprio come con gli indirizzi IP, vogliamo cercare un metodo di associare ad un numero un nome che sia facilmente utilizzabile per una persona fisica.
+\end{note}
+Questa branca della crittografia viene definita Identity-Based Encryption (IBE). Nel 2001, Boneh propose una prima soluzione partendo dai risultati di Joux.\\
+Il ragionamento fatto da Boneh e che è alla base dello schema, consiste nel fatto che è possibile istituire un 3-way DH, dove il PKG ha $s,g^s$ e si occupa solo distribuire la chiave a B, mentre A ($r,g^r$) e B ($t,g^t$) calcolano, rispettivamente $e(g^s,g^t)^r=\hat{g}^{rst},e(g^s,g^r)^t=\hat{g}^{rst}$.\\
+Di base lo schema non potrebbe funzionare perché in realtà $B$ \textbf{non ha} inizialmente la \textbf{chiave privata} $t$, quindi \textbf{non può svolgere il suo calcolo}. Tuttavia, il PKG può fornire a $B$ direttamente il valore $g^{st}=(g^t)^s=("bob")^s$ piuttosto che $\hat{g}^{st}$ e permettere di "barare" calcolando il pairing tra due punti di EC, come se $t$ fosse il discrete-log di $h_1("bob")$ base $g$.
+\begin{definition}[Boneh \& Franklin's IBE Scheme]\label{def:ibe}
+Sia $G$ un gruppo di \textbf{ordine primo} $q$, sia $e:G\times G\longrightarrow G_t$ una mappa bilineare e $g$ un generatore per $G$. Sia $\hat{g}=e(g,g)\in G_t$ e siano $h_1:\{0,1\}^*\longrightarrow G$, $h_2:G_t\longrightarrow\{0,1\}^*$ delle funzioni hash che, rispettivamente, \textbf{mappano una stringa in un numero su curva ellittica e viceversa}. \textbf{Tutti} questi parametri sono \textbf{pubblici}.\\
+Consideriamo tre attori, \textbf{Alice,Bob} e un \textbf{Private Key Generator}, e associamo ad ognuno di loro una chiave privata (random) e pubblica, estratta dallo stesso gruppo $G$.
+\begin{itemize}
+    \item $A$: $r,g^r$.
+    \item $PKG$: $s,g^s$
+    \item $B$: $"bob"$ (chiave pubblica).
+\end{itemize}
+Supponiamo che $A$ voglia inviare un messaggio $m$ a $B$. Allora $A$ deve calcolare:
+\begin{equation}\label{eq:ibeenc}
+    \begin{aligned}
+    Enc(g,g^s,"bob",m)&=(g^r,m\oplus h_2(e(h_1("bob"),g^s)^r)\\
+    &=(g^r,m\oplus h_2(e(h_1("bob"),g)^{sr})
+    \end{aligned}
+\end{equation}
+e inviare: 
+\[(u,v)=(g^r,m\oplus h_2(e(h_1("bob"),g)^{sr})\]
+Adesso il PKG può calcolare la private-key di $B$ come: 
+\begin{equation}\label{eq:makekey}
+w=MakeKey(s,"bob")=h_1("bob")^s    
+\end{equation}
+Quindi $B$ può decifrare nel seguente modo:
+\begin{equation}\label{eq:ibedec}
+    \begin{aligned}
+    Dec(u,v,w)&=v\oplus h_2(e(w,u))\\
+    &=m\oplus h_2(e(h_1("bob"),g)^{sr})\oplus h_2(e(\textcolor{red}{\underbrace{h_1("bob")^s}_{w}},\textcolor{blue}{\underbrace{g^r}_{u}}))\\
+    &=m\oplus h_2(e(h_1("bob"),g)^{sr})\oplus h_2(e(h_1("bob"),g)^{sr})=m
+    \end{aligned}
+\end{equation}
+\end{definition}
+\begin{remark}
+Per la definizione data di $h_1$, $B$ distribuisce il suo come come un punto di una curva ellittica, così come $g^s,g^r$. Questo ci permette di costruire un \textbf{ElGamal-like 3-party DH}, perché possiamo sfruttare il pairing per fare encryption e decryption. 
+\end{remark}
+Per realizzare lo schema in modo effettivo però bisogna concentrarsi su tre aspetti fondamentali:
+\begin{enumerate}
+    \item \textbf{Chi è il PKG?} Se il PKG fosse un'entità potrebbero esserci problemi di sicurezza legati all'affidabilità di essa, come con una qualsiasi CA, perché \textbf{può decifrare qualsiasi messaggio scambiato con questo schema} (rendendosi, \textbf{di fatto}, \textbf{più potente} di una CA), rendendo inutile la Public-Key-Infrastructure (PKI).
+    \item \textbf{Come costruirne uno?} 
+    \item Usare come \textbf{chiave pubblica} una \textbf{stringa} (pochi caratteri, soliti problemi ecc), ha \textbf{davvero} un \textbf{vantaggio} rispetto al prezzo pagato?
+\end{enumerate}
+Ovviamente, i primi due problemi possono essere risolti creando un \textbf{sistema distribuito} basato su secret-sharing, in modo tale che nessuna entità nella rete possa effettivamente decifrare tutto il traffico e mantenere i vantaggi di una IBE. Vediamone un esempio:
+
+\begin{definition}[Distributed PKG]\label{def:dpkg}
+    Consideriamo un sistema distribuito composta da $n$ entità impegnate a realizzare un \textbf{$(t,n)$ distributed secret sharing scheme}.
+    Consideriamo il gruppo $\mathbb{Z}_q$ di \textbf{ordine primo $q$}, con $q$ numero \textbf{primo grande} e $g,h$ due generatori per il gruppo. Sia $H_1:\{0,1\}^*\rightarrow G$ una funzione hash per mappare stringhe in interi.\\
+    Sia $P_i$ l'i-esimo nodo PKG, allora:
+    \begin{itemize}
+        \item \textbf{Setup:} $\forall i=1,\dots,n$ 
+        \begin{enumerate}
+            \item $P_i$ seleziona due polinomi \textbf{random} in $\mathbb{Z}_q$
+            \begin{equation*}
+                \begin{aligned}
+                    f_i(x)&=\sum_{k=0}^{t-1}a_{ik}\bmod{q}&
+                    f_i^\prime(x)&=\sum_{k=0}^{t-1}b_{ik}\bmod{q}
+                \end{aligned}
+            \end{equation*}
+            \item $P_i$ seleziona la sua chiave privata come $s_i=f_i(0)=a_{i0}$ e chiave pubblica $g^{s_i}$
+            \item $P_i$ calcola ed invia su canale sicuro e autenticato alle relative $P_j,\,j=1,\dots,n$ gli share:
+            \begin{equation*}
+                \begin{aligned}
+                    y_{ij}&=f_i(x_j)\bmod{q}&
+                    y_{ij}^\prime&=f_i^\prime(x_j)\bmod{q}
+                \end{aligned}
+            \end{equation*}
+            \item $P_i$ calcola ed invia in broadcast su canale sicuro e autenticato un \textbf{pedersen commit}
+            \[
+            c_{ik}=g^{a_{ik}}\cdot h^{b_{ik}}\bmod{q},\,k=0,\dots,t-1
+            \]
+        \end{enumerate}
+        \item \textbf{Verifying PKGs:} Il nodo $P_j$ ha ricevuto gli share $\{x_j,y_{ij},y_{ij}^\prime\}$ e controlla l'affidabilità del nodo $P_i$ calcolando:
+        \[
+        g^{y_{ij}}h^{y_{ij}}\stackrel{?}{=}\prod_{k=0}^{t-1}c_{ik}^{x_j^k}=g^{\sum_{k=0}^{t-1}a_{ik}x_{j}^k}h^{\sum_{k=0}^{t-1}b_{ik}x_j^k}=g^{f_i(x_j)}h^{f_i^\prime(x_j)}
+        \]
+        \begin{remark}
+            Se il controllo ha successo il nodo $P_i$ è considerato \textbf{trusted} da $P_j$. Altrimenti, se per $t+1$ nodi $P_j$ il controllo fallisce, $P_i$ è \textbf{untrusted} ed è escluso dal protocollo.
+        \end{remark}
+        \item \textbf{Private Key Extraction:} sia $C$ un client che utilizza la sua \textbf{identità "ID" come chiave pubblica} e vuole ottenere la sua chiave privata dal \textbf{Sistema DPKG}
+        \begin{enumerate}
+            \item $C$ contatta $t$ delle $n$ entità nel sistema DPKG per effettuare la richiesta.
+            \item I $t$ nodi che rispondo alla richiesta autenticano $C$ e gli inviano su canale sicuro e autenticato uno share del loro segreto insieme alla chiave pubblica:
+            \begin{equation*}
+                \begin{aligned}
+                    \sigma_i=H_1(\text{ID})^{y_i},&y_i=f_i(x_i),\,\forall i=1,\dots,t
+                \end{aligned}
+            \end{equation*}
+            \item $C$ può ricostruire il \textbf{master-secret} (\textbf{senza esporlo}) complessivo per calcolare la sua chiave privata $\Sigma$ e la chiave pubblica complessiva necessaria per le operazioni di IBE $g^s$:
+            \begin{equation*}
+                \begin{aligned}
+                    \Sigma&=\prod_{i=1}^{t-1}\sigma^{\Lambda_i}=H_1(\text{ID})^{\sum_{i=1}^{t-1}y_i\Lambda_i}=H_1(\text{ID})^s;&g^s&=\prod_{i=1}^{t-1}g^{s_i}\\
+                    \Lambda_i&=\prod_{k \neq i}\frac{-x_k}{x_i-x_k}\,\forall i=1,\dots,t
+                \end{aligned}
+            \end{equation*}
+            \item $C$ può verificare la validità del risultato ottenuto controllando che:
+            \begin{equation*}
+                e(\Sigma,g)=e(H_1(\text{ID})^s,g)\stackrel{?}{=}e(H_1(\text{ID}),g^s)=e(H_1(\text{ID}),g)^s
+            \end{equation*}
+        \end{enumerate}
+    \end{itemize}
+\end{definition}
+\begin{note}
+IBE, così come è stato concepito, in realtà non è così fondamentale. La sua generalizzazione, l'Attribute-Based-Encryption, è uno schema molto potente che permette di creare sistemi nei quali invece di distribuire chiavi, gli utenti possono accedere a contenuti cifrati per il semplice fatto di appartenere ad una particolare categoria, ovvero, perché posseggono \textbf{gli attributi necessari} per accedervi.
+\end{note}
+% andrebbe completato con l'ultima parte della lezione 35, ma non c'è per l'esame.

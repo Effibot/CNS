@@ -1,0 +1,141 @@
+\chapter{Mobile Devices Resilient to Capture}
+Quando un dispositivo mobile viene rubato, il proprietario non perde soltanto il valore economico del dispositivo ma anche i dati al suo interno. E' pertanto un problema non banale quello di tutelare gli utenti affinché dei dati "fisicamente" rubati, non possano essere acceduti.\\
+Vorremmo creare uno schema che renda un device impossibile di essere usato senza il consenso del proprietario, ovvero:
+\begin{definition}[Capture Resilient Device]\label{def:resdev}
+Dispositivo che può essere usato \textbf{solo e soltanto} dal proprietario.
+\end{definition}
+\begin{note}
+Assumiamo che il \textbf{"core"} di questo dispositivo sia una secret-key.
+\end{note}
+Alcuni approcci possibili possono essere:
+\begin{itemize}
+    \item password per bloccare/sbloccare (cifrare/decifrare) il dispositivo.
+    \item proteggere il segreto in un hardware "tamper-proof" (hardware che non può essere manomesso).
+    \item Download di una chiave da una repository in rete quando serve. 
+\end{itemize}
+Sappiamo che una password è una soluzione \textbf{generalmente} debole per proteggere un segreto, una repository remota (o il suo gestore) deve essere affidabile o potrebbero esserci altri problemi e un hardware \textbf{\textit{realmente}} impossibile da manomettere \textbf{per sempre} non è detto esista. Sembra quindi che siano necessarie altri sistemi.
+\section{Capture-Protection Server}
+MacKenzie e Raiter nel 2003 risolsero il problema, creando uno schema \textit{a tre player} che coinvolgeva un \textbf{untrusted server} che poteva essere anche non fidato e due approcci possibili: standard cryptography o secret sharing.
+\begin{note}
+L'idea è che se un attaccante dovesse riuscire a rubare il segreto di uno dei tre attori o una combinazione di 2 attori su 3, \textbf{non} è \textbf{possibile} dedurre niente e rompere il sistema.
+\end{note}
+\begin{remark}
+C'è una combinazione che può rompere il sistema: se un attaccante riuscisse a rubare sia la password che il device, allora sarebbe "digitalmente identico" al proprietario e non ci sarebbe niente da fare. \textbf{A meno di usare secret sharing}
+\end{remark}
+\begin{definition}[Capture-Protection Server]\label{def:capserver}
+Consideriamo:
+\begin{itemize}
+    \item \textbf{Utente} $U$, detiene \textbf{password} $P$.
+    \item \textbf{Dispositivo} $D$, detiene $\textcolor{red}{SK_D}, PK_D$.
+    \item \textbf{Server Remoto} $S$, detiene $SK_S, PK_S$.
+\end{itemize}
+Assumiamo che il \textbf{device} sia \textbf{sempre connesso} alla \textbf{rete} e che la sua chiave sia \textbf{protetta} da \textbf{cifratura} e che sia decifrabile \textbf{solo cooperando con il server}.\\
+Il protocollo si divide in due fasi:
+\end{definition}
+\begin{definition}[Capture-Protection Server: Device Init]\label{def:devinit}
+    \begin{enumerate}
+        \item L'utente registra, temporaneamente, \textcolor{red}{$P$} nel device. 
+        \item Scarichiamo, temporaneamente, sul device la \textcolor{red}{$PK_S$}.
+        \item Generiamo \textbf{due chiavi random} $v,a$ e calcoliamo
+        \[\textcolor{red}{b=H(P)}\]
+        \item Tramite stream-cipher\footnotemark cifriamo la $SK_D$
+        \[\textcolor{red}{c=SK_D\oplus PRF(v,P)}\]
+        \footnotetext{\textsuperscript{\thefootnote}ad esempio AES-CTR (\cref{def:ctrmode})}
+        Dove il keystream generato dalla $PRF$ dipende da un valore generato da $D$ e da un valore generato da $U$: \textbf{La ricostruzione è possibile solo se conosco entrambi}\footnotemark.
+        \footnotetext{\textsuperscript{\thefootnote}Questa costruzione permette di evitare il secret-sharing poiché il funzionamento è analogo: genero un segreto a partire da due valori, senza i quali non è rigenerabile.}
+        \item Generiamo un \textbf{ticket}\footnotemark tramite una funzione di \textbf{envelope}:
+        \[tkt=E_{PK_S}[a,b,c]=[a, H(\text{real pwd}), SK_S\oplus \text{keystream}]\]
+        e lo tengo in locale per un momento successivo.
+        \footnotetext{\textsuperscript{\thefootnote}Poiché l'\textbf{envelope} è fatto in funzione della public-key del server, questo la potrà decriptare ma non verrà mai a conoscenza degli altri segreti poiché sono cifrati.}
+        \item \textbf{Cancello} dal device: la password $P$ e il suo hash $b$, il ciphertext $c$ e la $SK_D$.
+    \end{enumerate}
+\end{definition}
+\begin{definition}[Capture-Protection Server: Key Retrieval]\label{def:keyretr}
+\begin{enumerate}
+    \item \textbf{Nel device} troviamo: $v,a,tkt,PK_D$.
+    \item L'utente \textbf{accede} al dispositivo con $P$.
+    \item Calcoliamo l'hash della password \textbf{inserita}:\[\beta=H(P)\]
+    \textbf{se l'utente è legittimo} $\beta\equiv b$.
+    \item Genero un random $\rho$ per cifrare il canale di comunicazione.
+    \item Invio al \textbf{remote-server} il $tkt$ e la sua autenticazione:
+    \[\text{HMAC}_a[tkt, E_{PK_S}[\beta,\rho]]\]
+    \item Il server decrypta il ticket e l'envelope, leggendo $a,b,c,\beta,\rho$.
+    \item Il server \textbf{controlla l'HMAC ricevuto} utilizzando la chiave $a$ e \textbf{autentica il device}.
+    \item Il server \textbf{decrypta l'hash della password} $\beta$ e la confronta con $b$ per \textbf{autenticare l'utente}.
+    \item Il server invia $\rho\oplus c$, per proteggere il trasporto della secret-key (cifrata) del device.
+    \item Il device ottiene la \textbf{sua} chiave privata decifrando:
+    \[(\rho \oplus c)\oplus \rho \oplus PRF(v,P)=SK_D\]
+    Solo un utente che ha il device e la password può decifrare la $SK_D$.
+    \end{enumerate}
+\end{definition}
+\begin{note}
+Un attaccante in possesso del device potrebbe vedere soltanto i valori di $v,a$ e il $tkt$. Tuttavia, dovrebbe riuscire a rompere l'envelope e dopo invertire l'hash o rompere $c$.
+\end{note}
+Le vulnerabilità aperte su questo schema sono due:
+\begin{itemize}
+    \item \textbf{L'attaccante viene in possesso di $SK_D$:} in questo caso è possibile ad esempio disconnettere il device dalla rete e accedere a tutto.
+    \item \textbf{device rubato e password predicibile}: prima o poi sarà possibile accedere alla secret-key facendo brute-forcing.
+\end{itemize}
+Negli altri casi siamo protetti:
+\begin{itemize}
+    \item \textbf{Server Cracked AND Password Known}: l'attaccante non può firmare/decifrare perché $v$ è \textbf{tenuta segreta nel device}, quindi $SK_D$ è cifrata con $PRV(v,P)$ e non può essere ottenuta.
+    \item \textbf{Device Cracked/Stolen}: l'attaccante può soltanto fare dictionary attack \textbf{online}. \textbf{TUTTAVIA} è facilmente individuabile perché anche se i \textbf{tentativi} di attacco sono \textbf{autenticati}, la password fallisce molte volte, a meno di avere una password difficile.
+    \item \textbf{Device and Server Cracked:} l'attaccante può soltanto fare dictionary attack \textbf{offline} perché conosce $b$ e cercare la password.
+\end{itemize}
+La vulnerabilità rimasta al protocollo può essere fixata introducendo un \textbf{threshold secret-sharing}, \textbf{nascondendo} la SK anche allo \textbf{stesso device}.
+%% finisci slide 31 aggiungendo versione boostata del protocollo. Qui sotto cancella tanto è inutile.
+\begin{corollary}[Threshold SS for Capture-Protection: Device Init]\label{def:captureboost}
+Supponiamo di utilizzare uno schema di Secret-Sharing (2,2) con RSA come sistema di firma:
+\begin{enumerate}
+        \item L'utente registra, temporaneamente, \textcolor{red}{$P$} nel device. 
+        \item Scarichiamo, temporaneamente, sul device la \textcolor{red}{$PK_S$}.
+        \item Generiamo \textbf{due chiavi random} $v,a$ e calcoliamo
+        \[\textcolor{red}{b=H(P)}\]
+        \item Assegniamo $n=p\cdot q$. Quindi \textcolor{red}{$\phi(n)=(p-1)(q-1)$} e seleziono $e,\textcolor{red}{d}$ secondo \textbf{RSA} (\cref{def:rsakey})
+        \item Genero Share 1: \textcolor{red}{$d_1=PRF(v,P)$}.\footnotemark
+        \footnotetext{\textsuperscript{\thefootnote}La ricostruzione dello share \textbf{a posteriori} è possibile \textbf{se solo se} conosco sia $v$ che $P$}
+        \item Genero Share 2: \textcolor{red}{$d_2=d-d_1\mod\phi(n)$}.
+        \item Genero \textbf{Disabling-Key}: $t$. Questa chiave \textbf{va mantenuta offline}.
+        \item Genero \textbf{Disabling Value}: \textcolor{red}{$u=H(t)$}.
+        \item Genero ed invio un \textbf{ticket} tramite una funzione di \textbf{envelope}:
+        \[tkt=E_{PK_S}[a,b,u,d_2,N]\]
+        \begin{itemize}
+            \item $a$: device auth.
+            \item $b$: pw auth.
+            \item $d_2$: second share.
+            \item $N$: RSA sign.
+        \end{itemize}
+        \item \textbf{Cancello} dal device tutto ciò che è in \textcolor{red}{rosso}.
+    \end{enumerate}
+\end{corollary}\pagebreak
+\begin{corollary}[Threshold SS for Capture-Protection: Key Retrieval]\label{def:retrboost}
+Sia $m$ il messaggio da firmare, \textbf{ogni volta} che avviene una transazione con il server.
+\begin{enumerate}
+    \item \textbf{Nel device} troviamo: $v,a,tkt,e,N$.
+    \item L'utente \textbf{accede} al dispositivo con $P$.
+    \item Calcoliamo l'hash della password \textbf{inserita}:\[\beta=H(P)\]
+    \textbf{se l'utente è legittimo} $\beta\equiv b$.
+    \item Genero un random $\rho$ per cifrare il canale di comunicazione.
+    \item Invio al \textbf{remote-server} il $tkt$ e la sua autenticazione:
+    \[\text{HMAC}_a[tkt, E_{PK_S}[H(m),\beta,\rho]]\]
+    \item Il server decrypta il ticket, leggendo $a,b,d_2,u,N$.
+    \item Il server \textbf{controlla l'HMAC ricevuto} utilizzando la chiave $a$ e \textbf{autentica il device}.
+    \item \textbf{Se solo se} il \textbf{device} è \textbf{autenticato} il server \textbf{decrypta il resto del messaggio} leggendo $H[m]\beta,\rho$.
+    \item Il server confronta $\beta$ con $b$ per \textbf{autenticare l'utente}.
+    \item Il server controlla se $u\ne{H(t)}$, dove $t$ è una delle \textbf{disabling-key} mantenute nella black-list del server. \textbf{Se c'è un match}, allora il \textbf{device} è stato \textbf{rubato} e ignora il resto del protocollo, altrimenti...
+    \item Il server invia la sua firma del messaggio $\rho\oplus H[m]^{d_2}$, per proteggere il trasporto della secret-key (cifrata) del device.
+    \item Il device decifra il messaggio ottenuto per ottenere \[H[m]^{d_2}=(\rho\oplus H[m]^{d_2})\oplus \rho\]
+    \item Il device \textbf{completa la firma}, calcolando a runtime:
+    \begin{align*}
+        d_1=PRF[v,P]\\
+        H[m]^{d_2}H[m]^{d_1}\bmod{N}
+    \end{align*}
+    \end{enumerate}
+\end{corollary}
+\begin{note}
+La \textbf{signature-key} $d$ \textbf{non è mai} trasmessa in chiaro. Pertanto, se un attaccante ottiene \textbf{sia} la password \textbf{che} il device, non può ottenere $d$ e firmare messaggi come fosse il proprietario.
+\end{note}
+Con questo metodo, possiamo ampliare il protocollo con una funzione di disattivazione:
+\begin{corollary}[Threshold SS for Capture-Protection: Key Disabling]\label{def:keydis}
+Il server mantiene un database dove salva le associazioni $\{ticket,t\}$ che vengono black-listate. Se un utente \textbf{mantiene una copia off-line} di $t$, e il suo device viene rubato, può inviare al server in un qualsiasi momento un messaggio contenente la disabling-key e il server dopo aver autenticato l'utente inserirà il device nella black-list.
+\end{corollary}
