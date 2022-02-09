@@ -217,13 +217,16 @@ Adesso calcoliamo:
     c_1^r\cdot c_2^s=(m^{e_a})^r+(m^{e_b})^s=m^{e_a\cdot r+e_b\cdot s}=m
 \end{equation}
 E abbiamo decryptato il messaggio senza conoscere la chiave di decrittazione/privata.
-\end{proof}
+\end{proof}\pagebreak
 \begin{remark}\textbf{RSA Common Modulus Attack} è possibile quando:
 \begin{itemize}
     \item due sistemi RSA usano \textbf{lo stesso modulo $N$} per due \textbf{differenti coppie} $(e,d)$ e \textbf{viene cifrato lo stesso messaggio}
 \end{itemize}
 \end{remark}
-Utilizziamo ora l'\cref{eq:rsamod} a nostro vantaggio per eliminare il fattore $L!$.
+Utilizziamo ora l'\cref{eq:rsamod} a nostro vantaggio per eliminare il fattore $L!$ (ovvero il numero massimo di player nello schema).
+\begin{note}
+    Nella pratica, sarebbe possibile usare anche un altro numero al posto di $L!$, purché il termine usato permetta di ottenere tutti esponenziali interi.
+\end{note}
 \begin{definition}[Shoup - RSA Threshold]\label{def:shouprsa}
 Come \textbf{Dealer}:
 \begin{enumerate}
@@ -233,10 +236,12 @@ Come \textbf{Dealer}:
     \item Invio share i-esimo: $(i,y_i)\bmod\phi(N)$
     \item Firmo lo share\footnotemark come: $H(m)^{y_i\overline{\Lambda}_{x_i}}\bmod N$ dove
     \[\overline{\Lambda}_{x_i}=L!\Lambda_i=L!\prod_{\text{shares} x_k\ne x_i}\frac{-x_k}{x_i-x_k}\]
+    \item La firma pubblicata è però $H(m)^d$, ottenuta effettuando i passi nell'osservazione successiva.
     \footnotetext{\textsuperscript{\thefootnote}Adesso è possibile poiché esponente intero e non serve più l'inversa.}
 \end{enumerate}
 Come \textbf{Verifier} per ricostruire la firma faccio:
 \[\prod H(m)^{y_i\overline{\Lambda}_{x_i}}=H(m)^{L!\sum y_i\Lambda_{x_i}}=H(m)^{d\cdot L!}\bmod{N}\]
+Adesso per ottenere la firma esatta ed effettuare la verifica, applico i seguenti passi:\\
 \begin{remark}
 Sia ora $L!=\Delta$. Allora:
 \[H(m)^{d\cdot L!}=H(m)^{d\Delta}=v^{\Delta}\]
