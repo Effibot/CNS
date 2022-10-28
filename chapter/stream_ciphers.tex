@@ -15,12 +15,12 @@ L'algoritmo che genera il keystream è ciò che differenzia un cifratore dall'al
 \end{remark}
 \begin{proposition}[Pro e Contro]
 \begin{itemize}
-    \item [\textcolor{green}{\textbf{PRO:}}]Lo schema in \cref{fig:stream_ciphers} permette di ottenere un testo cifrato in cui se una sotto-sequenza di bit si ripete, ognuna verrà cifrata \textbf{sempre} in modo diverso.
+    \item [\textcolor{green}{\textbf{PRO:}}]Lo schema in \cref{fig:stream_ciphers} permette di ottenere un testo cifrato in cui se una sotto-sequenza di bit si ripete, ogniuna verrà cifrata \textbf{sempre} in modo diverso.
     \item [\textcolor{red}{\textbf{CONS:}}]Se il messaggio viene cifrato una seconda volta, il testo cifrato sarà comunque \textbf{sempre} uguale a se stesso.
 \end{itemize}
 \end{proposition}
 \section{Gli Initialization Vectors}
-Poiché uno stream cipher implica l'utilizzo di una chiave statica e l'algoritmo di pseudo-random è deterministico per definizione, un messaggio verrà cifrato sempre nello stesso modo. Questo significa che perdiamo la proprietà di \textit{IND-CPA}.\\
+Poiché uno stream cipher implica l'utilizzo di una chiave statica e l'algoritmo di pseudo-random è deterministo per definizione, un messaggio verrà cifrato sempre nello stesso modo. Questo significa che perdiamo la proprietà di \textit{IND-CPA}.\\
 Gli Initialization Vectors sono dei vettori di numeri generati randomicamente ad ogni nuovo messaggio inviato che permettono di mantenere una \textit{sicurezza semantica}\footnotemark  a patto che \textbf{\textit{non si ripetano MAI}}.
 \footnotetext{Un cifratore è \textbf{semantically secure} se è impossibile estrarre informazioni sensibili del plain-text dal cipher-text.}
 \begin{figure}[ht]
@@ -32,7 +32,7 @@ Gli Initialization Vectors sono dei vettori di numeri generati randomicamente ad
 Abbiamo diversi modi per generare degli IV che siano sempre nuovi, al fine di applicare lo schema in \cref{fig:streamiv}:
 
 \begin{itemize}
-    \item \textbf{(Truly) Random:} ovvio. Di positivo ha che non può essere predicibile, ma non realizzabile se non affidandosi ad effettive fluttuazioni naturali.
+    \item \textbf{(Truly) Random:} ovvio. Di positivo ha che non può essere predibile, ma non realizzabile se non affidandosi ad effettive fluttuazioni naturali.
     \item \textbf{Sequence Number:} un numero di sequenza può essere sempre nuovo, ma può essere predetto, ad esempio identificando dopo quanti cicli la sequenza inizia a ripetersi; basta catturare un numero sufficiente di pacchetti o fare in modo di individuare i momenti in cui la rete si riavvia, per sincronizzarsi con la scheda in trasmissione.
 \end{itemize}
 
@@ -117,7 +117,7 @@ Calcoliamo $CRC32(\delta)=c(\delta)$ e calcoliamo infine:
     &=RC4(IV,K)\oplus\{M',c(M')\}
     \end{aligned}
 \end{equation*}
-Vediamo quindi che unendo al messaggio cifrato la concatenazione $\{\delta,c(\delta)\}$ la parità misurata dall'algoritmo di controllo non risulta alterata grazie alla parità.
+Vediamo quindi che unendo al messaggio cifrato la concatenzazione $\{\delta,c(\delta)\}$ la parità misurata dall'algoritmo di controllo non risulta alterata grazie alla parità.
 \end{proof}
 \begin{remark}
 In sintesi, il fatto che $CRC(32)$ sia lineare, risulta una debolezza per il sistema.

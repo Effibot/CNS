@@ -99,7 +99,7 @@ Nel Record Protocol è possibile notare il primo grande errore delle versioni an
 
 \begin{itemize}
     \item La compressione è di tipo \textit{loseless}\footnote{Senza perdita di informazioni.} e viene fatta prima di cifrare, in quanto non avrebbe senso cercare una logica di compressione nel digest (serve un messaggio a bassa entropia).\footnote{Una compressione può essere tipo $f(AAAA) = 4A$. In un messaggio (pseudo)randomico non avrebbe senso.}
-    \item Il MAC viene generato con una \textbf{HMAC-construction} (\cref{def:hmac}) tramite chiave simmetrica scambiata durante il set-up dei parametri di sicurezza negoziati in fase di handshake, così come l'hash-function.
+    \item Il MAC viene generato con una \textbf{HMAC-construction} (\cref{def:hmac}) tramite chiave simmetrica scambiata durante il set-up dei parametri di sicurezza negoziati in fase di hanshake, così come l'hash-function.
     \item La cifratura è applicata al singolo fragment e al suo MAC (possibilmente compressi) e non sarebbe possibile senza una negoziazione iniziale. L'algoritmo usato è un block o stream cipher (\cref{chap:blkcipher}, \cref{chap:streamcipher}), anch'esso deciso in fase di negoziazione ma la dimensione del digest non deve superare 1024 bytes.
 \end{itemize}
 La parte relativa ai dati trasmessi del Record Protocol (\cref{fig:tlsstack}) è una struttura dati con i seguenti campi:
@@ -918,7 +918,7 @@ Le \textbf{chiavi di sessioni} utilizzate per criptare i dati con 0-RTT vengono 
     \[\text{Keys}=\text{HKDF}(PSK,label,\{nonce_C,nonce_S,g^{xy}\mod(P)\})\]
 \end{enumerate}
 \end{definition}
-L'inclusione dei coefficienti DH permette di rispettare le condizioni necessarie alla PFS. Tuttavia, le \textbf{chiavi temporanee} di sessione utilizzate nel primo messaggio \textbf{non} includono la \textbf{nonce} ed il coefficiente del server, per cui la way-1 dell'handshake è vulnerabile a replay attack. Alcune possibili mitigazioni sono:
+L'inclusione dei coefficienti DH permette di rispettare le condizioni necessarie alla PFS. Tuttavia, le \textbf{chiavi temporanee} di sessione utilizzate nel primo messaggio \textbf{non} inlcudono la \textbf{nonce} ed il coefficiente del server, per cui la way-1 dell'handshake è vulnerabile a replay attack. Alcune possibili mitigazioni sono:
 \begin{itemize}
     \item \textbf{Inserire} una \textbf{finestra di validità} per la \textbf{pre-shared key} così da limitare l'intervallo temporale in cui possono avvenire replay attack sull'handshake.
     \item \textbf{Controllare} il \textbf{riuso di nonce} da parte del client, così da individuare replay attacks. Tuttavia, tale soluzione è poco scalabile.

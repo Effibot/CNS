@@ -146,63 +146,8 @@ Per realizzare lo schema in modo effettivo però bisogna concentrarsi su tre asp
 \end{enumerate}
 Ovviamente, i primi due problemi possono essere risolti creando un \textbf{sistema distribuito} basato su secret-sharing, in modo tale che nessuna entità nella rete possa effettivamente decifrare tutto il traffico e mantenere i vantaggi di una IBE. Vediamone un esempio:
 
-\begin{definition}[Distributed PKG]\label{def:dpkg}
-    Consideriamo un sistema distribuito composta da $n$ entità impegnate a realizzare un \textbf{$(t,n)$ distributed secret sharing scheme}.
-    Consideriamo il gruppo $\mathbb{Z}_q$ di \textbf{ordine primo $q$}, con $q$ numero \textbf{primo grande} e $g,h$ due generatori per il gruppo. Sia $H_1:\{0,1\}^*\rightarrow G$ una funzione hash per mappare stringhe in interi.\\
-    Sia $P_i$ l'i-esimo nodo PKG, allora:
-    \begin{itemize}
-        \item \textbf{Setup:} $\forall i=1,\dots,n$ 
-        \begin{enumerate}
-            \item $P_i$ seleziona due polinomi \textbf{random} in $\mathbb{Z}_q$
-            \begin{equation*}
-                \begin{aligned}
-                    f_i(x)&=\sum_{k=0}^{t-1}a_{ik}\bmod{q}&
-                    f_i^\prime(x)&=\sum_{k=0}^{t-1}b_{ik}\bmod{q}
-                \end{aligned}
-            \end{equation*}
-            \item $P_i$ seleziona la sua chiave privata come $s_i=f_i(0)=a_{i0}$ e chiave pubblica $g^{s_i}$
-            \item $P_i$ calcola ed invia su canale sicuro e autenticato alle relative $P_j,\,j=1,\dots,n$ gli share:
-            \begin{equation*}
-                \begin{aligned}
-                    y_{ij}&=f_i(x_j)\bmod{q}&
-                    y_{ij}^\prime&=f_i^\prime(x_j)\bmod{q}
-                \end{aligned}
-            \end{equation*}
-            \item $P_i$ calcola ed invia in broadcast su canale sicuro e autenticato un \textbf{pedersen commit}
-            \[
-            c_{ik}=g^{a_{ik}}\cdot h^{b_{ik}}\bmod{q},\,k=0,\dots,t-1
-            \]
-        \end{enumerate}
-        \item \textbf{Verifying PKGs:} Il nodo $P_j$ ha ricevuto gli share $\{x_j,y_{ij},y_{ij}^\prime\}$ e controlla l'affidabilità del nodo $P_i$ calcolando:
-        \[
-        g^{y_{ij}}h^{y_{ij}}\stackrel{?}{=}\prod_{k=0}^{t-1}c_{ik}^{x_j^k}=g^{\sum_{k=0}^{t-1}a_{ik}x_{j}^k}h^{\sum_{k=0}^{t-1}b_{ik}x_j^k}=g^{f_i(x_j)}h^{f_i^\prime(x_j)}
-        \]
-        \begin{remark}
-            Se il controllo ha successo il nodo $P_i$ è considerato \textbf{trusted} da $P_j$. Altrimenti, se per $t+1$ nodi $P_j$ il controllo fallisce, $P_i$ è \textbf{untrusted} ed è escluso dal protocollo.
-        \end{remark}
-        \item \textbf{Private Key Extraction:} sia $C$ un client che utilizza la sua \textbf{identità "ID" come chiave pubblica} e vuole ottenere la sua chiave privata dal \textbf{Sistema DPKG}
-        \begin{enumerate}
-            \item $C$ contatta $t$ delle $n$ entità nel sistema DPKG per effettuare la richiesta.
-            \item I $t$ nodi che rispondo alla richiesta autenticano $C$ e gli inviano su canale sicuro e autenticato uno share del loro segreto insieme alla chiave pubblica:
-            \begin{equation*}
-                \begin{aligned}
-                    \sigma_i=H_1(\text{ID})^{y_i},&y_i=f_i(x_i),\,\forall i=1,\dots,t
-                \end{aligned}
-            \end{equation*}
-            \item $C$ può ricostruire il \textbf{master-secret} (\textbf{senza esporlo}) complessivo per calcolare la sua chiave privata $\Sigma$ e la chiave pubblica complessiva necessaria per le operazioni di IBE $g^s$:
-            \begin{equation*}
-                \begin{aligned}
-                    \Sigma&=\prod_{i=1}^{t-1}\sigma^{\Lambda_i}=H_1(\text{ID})^{\sum_{i=1}^{t-1}y_i\Lambda_i}=H_1(\text{ID})^s;&g^s&=\prod_{i=1}^{t-1}g^{s_i}\\
-                    \Lambda_i&=\prod_{k \neq i}\frac{-x_k}{x_i-x_k}\,\forall i=1,\dots,t
-                \end{aligned}
-            \end{equation*}
-            \item $C$ può verificare la validità del risultato ottenuto controllando che:
-            \begin{equation*}
-                e(\Sigma,g)=e(H_1(\text{ID})^s,g)\stackrel{?}{=}e(H_1(\text{ID}),g^s)=e(H_1(\text{ID}),g)^s
-            \end{equation*}
-        \end{enumerate}
-    \end{itemize}
-\end{definition}
+%fare esercizio di implementare dist pkg with secret-sharing. Magari vedi Boneh-Franklin che dovrebbero averlo fatto nel paper.
+
 \begin{note}
 IBE, così come è stato concepito, in realtà non è così fondamentale. La sua generalizzazione, l'Attribute-Based-Encryption, è uno schema molto potente che permette di creare sistemi nei quali invece di distribuire chiavi, gli utenti possono accedere a contenuti cifrati per il semplice fatto di appartenere ad una particolare categoria, ovvero, perché posseggono \textbf{gli attributi necessari} per accedervi.
 \end{note}

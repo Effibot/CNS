@@ -44,7 +44,7 @@ Consideriamo una SIM all'interno della quale è stata scritta la public-key dell
 Facciamo uno scambio di chiavi:
 \begin{enumerate}
     \item Viene generata la chiave pubblica $g^x$.
-    \item Viene derivata la chiave di cifratura con $K=HKDF(g^{HN\cdot x})$.
+    \item Viene derivta la chiave di cifratura con $K=HKDF(g^{HN\cdot x})$.
     \item L'utente invia in modo cifrato il suo \textbf{SUPI}\footnote{La nuova versione dell'IMSI.} con $AES_K(SUPI)$ insieme ad un HMAC per la verifica e la sua chiave pubblica.
     \item In ricezione la HN prende il pacchetto $(g^x,AES_K(SUPI),HMAC(AES_K(SUPI)))$ e usa $g^x$ per ricostruire la chiave con $K=HKDF(g^{HN\cdot x})$.
     \item Viene usata la chiave ricostruita per decifrare e fare la verifica di integrità.
@@ -63,31 +63,27 @@ Il problema di questo schema è che una volta che la chiave viene ricostruita è
 \end{problem}
 La risposta è ovviamente si e possiamo pensare di usare uno schema ElGamal-like, dove la chiave pubblica è generata on-the-fly per ogni nuovo messaggio e quindi in decryption il denominatore sarà qualcosa del tipo $g^{r_is}$ per il messaggio \textit{i-esimo}. Lo schema corretto è il seguente:
 \begin{definition}[threshold ElGamal]\label{def:treshelg}
-Consideriamo uno schema (t,n). Sia $p$ strong-prime, con $q$ large prime. Sia $g\in QR_p$ il generatore del sottogruppo. Presa secret-key $s\in\mathbb{Z}_q$ random, la pub-key è $h=g^s\bmod{p}$.\\
-\textbf{Come Dealer:}
+Consideriamo uno schema (t,n).
+Come Dealer:
 \begin{enumerate}
-    \item Genero polinomio $p(x)\bmod{q}$ di ordine $t-1$ e invio ad ogni parte $(x_i, y_i)$ con $y_i=p(x_i)\bmod{q}$.
-    \item Faccio trasmissione del messaggio $m$ tramite ElGamal (\cref{def:elgam}), inviando 
-    \[ (R,c)=(g^r,m\cdot h^r)\bmod{p}\]
-    con $r\in\mathbb{Z}_q$
+    \item Genero polinomio $p(x_i)$ e invio ad ogni parte $(x_i, y_i)$ con $y_i=p(x_i)$.
+    \item Faccio trasmissione del messaggio tramite ElGamal (\cref{def:elgam}), inviando 
+    \[ (R,c)=(g^r,m\cdot h^r)\]
 \end{enumerate}
-\textbf{Come Receiver:}
+Come Receiver:
 \begin{enumerate}
-    \item Estraggo chiave pubblica $g^r$ dal messaggio ricevuto.
+    \item Estraggo chiave pubblica $g^r$ dal ciphertext.
     \item Calcolo il coefficiente di Lagrange:
-    \[\Lambda_{x_i}=\prod_{\text{shares} x_k\ne x_i}\frac{-x_k}{x_i-x_k}\bmod{q}\]
-    \item Calcolo l'esponenziale dello share per la decrittazione: $w_i=(g^r)^{y_i\Lambda_i}\bmod{p}$
+    \[\Lambda_{x_i}=\prod_{\text{shares} x_k\ne x_i}\frac{-x_k}{x_i-x_k}\]
+    \item Calcolo l'esponenziale dello share per la decrittazione: $(g^r)^{y_i\Lambda_i}$
     \item Raccogliendo $t$ shares, possiamo ricostruire la chiave di decrittazione:
-    \[\prod_{i=1}^{t}w_i=\prod_{i=1}^{t}(g^r)^{y_i\Lambda_i}=(g^r)^{\sum_{i=1}^{t}{y_i\Lambda_i}}=(g^r)^s=g^{rs}\bmod{p}\]
+    \[\prod_{i=1}^{t}(g^r)^{y_i\Lambda_i}=(g^r)^{\sum_{i=1}^{t}{y_i\Lambda_i}}=(g^r)^s=g^{rs}\]
     \item La decrittazione è possibile: 
-    \[m=c\cdot R^{-s}=\frac{c}{(g^r)^s}=\frac{m\cdot h^r}{g^{rs}}=\frac{m\cdot g^{rs}}{g^{rs}}\bmod{p}\]
+    \[m=c\cdot R^{-s}=\frac{c}{(g^r)^s}=\frac{m\cdot h^r}{g^{rs}}=\frac{m\cdot g^{rs}}{g^{rs}}\]
 \end{enumerate}
-\begin{remark}
-    La secret-key $s$ non viene \textbf{mai rivelata/ricostruita} poiché per ogni messaggio $m$ viene generata una nuova nonce $r$ e quindi la \textbf{chiave di decifratura} $g^{rs}$ sarà \textbf{sempre diversa}.
-\end{remark}
 \end{definition}
 \section{Threshold Signature}
-La threshold signature è uno use-case molto più importante rispetto alla threshold encryption perché permette a $t$ membri di un gruppo di $n$ elementi di firmare un messaggio. Questo consente di fare cose come:
+La threshdold signature è uno use-case molto più importante rispetto alla threshold encryption perché permette a $t$ membri di un gruppo di $n$ elementi di firmare un messaggio. Questo consente di fare cose come:
 \begin{itemize}
     \item Verifica della validità della firma da molteplici fonti.
     \item Un membro del gruppo può essere certificato dagli altri $t$ membri.
@@ -108,12 +104,13 @@ Uno dei sistemi di firma che possono essere fatti è tramite RSA, vediamone lo s
     \item \textbf{Controllo la firma:} \{$H(M)=(H(m)^d)^e$\}
 \end{enumerate}
 \end{definition}
+\pagebreak
 Per estendere questo schema ad uno a soglia, potremmo procedere con il solito approccio:
 \begin{enumerate}
     \item Come dealer, genero un polinomio $f(x)$ tale che $f(0)=d$.
     \item Invio lo share $(x_i,y_i=f(x_i))\bmod\phi(N)$
     \item Invio messaggi firmati $\{m, H(m)\}$
-    \item Share della firma: $H(m)^{y_i\Lambda_i}\bmod{N}$
+    \item Firmo lo share: $H(m)^{y_i\Lambda_i}\bmod{N}$
     \item Verifico firma: $\prod H(m)^{y_i\Lambda_i}=H(m)^{\sum y_i\Lambda_i}=H(m)^d$
 \end{enumerate}
 Se provassimo ad eseguire questo schema, troveremmo che non funziona, perché:
@@ -128,46 +125,7 @@ Tuttavia, il funzionamento di RSA è dovuto al fatto che l'esponenziale è calco
 Se il termine $\beta$ fosse pari, non potremmo neanche calcolare l'inversa modulare.
 \end{remark}
 \begin{note}
-Uno schema (n,n), non avendo la frazione (no termine di Lagrange), avrebbe funzionato.\pagebreak
-\begin{definition}[RSA (n,n) Signature]\label{def:nnrsasign}
-\begin{itemize}
-    \item \textbf{RSA Setup:} seleziona $p,q$ large primes tale che
-    \begin{equation*}
-        \begin{aligned}
-            &N=p\cdot q\longrightarrow \phi(N)=(p-1)(q-1)\\
-            &1<e<\phi(N)\,:\,\gcd(e,\phi)=1\longrightarrow d=e^{-1}\bmod{\phi}
-        \end{aligned}
-    \end{equation*}
-    \item \textbf{Dealer:}
-    \begin{itemize}
-        \item genera $n$ shares truly random tale che:
-        \[y_i=
-        \begin{cases}
-            r_i\bmod{\phi}&\text{if $i\ne n$}\\
-            d-\sum_{i=1}^{n}r_i\bmod{\phi}&\text{if $i=n$}
-        \end{cases}    
-        \]
-        \item invia ad ogni peer il relativo share.
-    \end{itemize}
-    \item \textbf{Receiver:} Ogni peer esegue
-    \begin{itemize}
-        \item Dato il messaggio $m$ calcola $H(m)$.
-        \item Si crea uno \textbf{share della firma}: $w_i=H(m)^{y_i}\bmod{N}$
-        \item Si comunica lo share agli altri peer.
-   \end{itemize}
-   \item \textbf{Verifica della firma:} ogni peer raccoglie gli share delle altre parti e
-   \begin{itemize}
-       \item Si ricostruisce la firma condivisa:
-       \[
-       \prod_{i=1}^{n}w_i=H(m)^{\sum_{i=1}^{n}y_i}=H(m)^{d-\sum_{i=1}^{n}r_i+\sum_{i=1}^{n}r_i}=H(m)^d\bmod{N}
-       \]
-       \item Si verifica la correttezza della firma calcolando $H(m)$ e verificando che
-       \[
-       H(m)=(H(m)^d)^e\bmod{N}
-       \]
-   \end{itemize}
-\end{itemize}
-\end{definition}
+Uno schema (n,n), non avendo la frazione (no termine di Lagrange), avrebbe funzionato.
 \end{note}
 Vediamo una soluzione al problema, proposta da Victor Shoup\footnotetext{\href{https://www.iacr.org/archive/eurocrypt2000/1807/18070209-new.pdf}{Victor Shoup - RSA Threshdol}}:
 Consideriamo uno scenario con $L$ player e assumiamo come sempre che lo share sia del tipo $x_i=i$. La base di lagrange che andrà calcolata nel caso di uno schema $(L,L)$ sarà del tipo:
@@ -217,16 +175,13 @@ Adesso calcoliamo:
     c_1^r\cdot c_2^s=(m^{e_a})^r+(m^{e_b})^s=m^{e_a\cdot r+e_b\cdot s}=m
 \end{equation}
 E abbiamo decryptato il messaggio senza conoscere la chiave di decrittazione/privata.
-\end{proof}\pagebreak
+\end{proof}
 \begin{remark}\textbf{RSA Common Modulus Attack} è possibile quando:
 \begin{itemize}
     \item due sistemi RSA usano \textbf{lo stesso modulo $N$} per due \textbf{differenti coppie} $(e,d)$ e \textbf{viene cifrato lo stesso messaggio}
 \end{itemize}
 \end{remark}
-Utilizziamo ora l'\cref{eq:rsamod} a nostro vantaggio per eliminare il fattore $L!$ (ovvero il numero massimo di player nello schema).
-\begin{note}
-    Nella pratica, sarebbe possibile usare anche un altro numero al posto di $L!$, purché il termine usato permetta di ottenere tutti esponenziali interi.
-\end{note}
+Utilizziamo ora l'\cref{eq:rsamod} a nostro vantaggio per eliminare il fattore $L!$.
 \begin{definition}[Shoup - RSA Threshold]\label{def:shouprsa}
 Come \textbf{Dealer}:
 \begin{enumerate}
@@ -236,22 +191,16 @@ Come \textbf{Dealer}:
     \item Invio share i-esimo: $(i,y_i)\bmod\phi(N)$
     \item Firmo lo share\footnotemark come: $H(m)^{y_i\overline{\Lambda}_{x_i}}\bmod N$ dove
     \[\overline{\Lambda}_{x_i}=L!\Lambda_i=L!\prod_{\text{shares} x_k\ne x_i}\frac{-x_k}{x_i-x_k}\]
-    \item La firma pubblicata è però $H(m)^d$, ottenuta effettuando i passi nell'osservazione successiva.
     \footnotetext{\textsuperscript{\thefootnote}Adesso è possibile poiché esponente intero e non serve più l'inversa.}
 \end{enumerate}
 Come \textbf{Verifier} per ricostruire la firma faccio:
 \[\prod H(m)^{y_i\overline{\Lambda}_{x_i}}=H(m)^{L!\sum y_i\Lambda_{x_i}}=H(m)^{d\cdot L!}\bmod{N}\]
-Adesso per ottenere la firma esatta ed effettuare la verifica, applico i seguenti passi:\\
 \begin{remark}
-Sia ora $L!=\Delta$. Allora:
-\[H(m)^{d\cdot L!}=H(m)^{d\Delta}=v^{\Delta}\]
-Osserviamo che la quantità $H(m)=[H(m)^{d}]^e=v^e$ è nota\footnotemark.
-\footnotetext{\textsuperscript{\thefootnote}La chiave di cifratura $e$ è pubblica e può essere usata.}
-Poiché vogliamo $H(m)^d=v$ per controllare la firma, usando l'RSA Common Modulus Attack (\cref{thm:rsacomm}) troviamo $v$, \textbf{se $\Delta$ ed $e$ sono coprimi\footnotemark}:
-\begin{itemize}
-    \item tramite $ExtGCD(e,\Delta)$ troviamo $(r,s)$.
-    \item Calcoliamo: $(v^{e})^r\cdot (v^{\Delta})^s=v^{e\cdot r+\Delta\cdot s}=v$
-\end{itemize}
+Sia $L!=\Delta$ la public key con cui è cifrata la firma e osserviamo che la quantità $H(m)=[H(m)^{d}]^e$ è nota\footnotemark.
+\footnotetext{\textsuperscript{\thefootnote}L'hash del messaggio può essere vista come l'encryption del messaggio cercato $H(m)^d$}
+Allora:
+\[H(m)^{d\cdot L!}=H(m)^{d\Delta}=y^{\Delta}\]
+Poiché vogliamo $H(m)=y$ e $H(m)=y^e$ è noto, usando l'attacco \cref{thm:rsacomm} troviamo $y$, \textbf{se $\Delta$ ed $e$ sono coprimi\footnotemark}.
 \end{remark}
 \footnotetext{\textsuperscript{\thefootnote}Questo succede praticamente sempre se $e$ è un numero pimo più grande di $L$. Altrimenti la firma con RSA resta uguale.}
 \end{definition}
@@ -263,3 +212,4 @@ Schoup dimostrò anche la verificabilità del secret sharing fatto con questa te
 \begin{note}
 Il problema che questo schema ha è che \textbf{almeno una} persona nel mondo conosce $\phi(N)$, il Dealer. Questo problema è stato risolto da Foque e Stern, nel 2001. Non lo vediamo, anche perché RSA al giorno d'oggi è obsoleto rispetto ad altri sistemi di sicurezza.
 \end{note}
+%\begin{definition}[Elliptic Curve Integrated Encryption Scheme]\label{def:ecies}\end{definition}

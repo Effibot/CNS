@@ -23,7 +23,7 @@ IPSec \textbf{coopera} e \textbf{coesiste} con il protocollo IP, per cui nella \
 \begin{definition}[IPSec Architecture]\label{def:ipsecarc}
 Nel protocollo IPSec distinguiamo le seguenti componenti: (\cref{fig:ipsecarc})
 \begin{itemize}
-    \item \textbf{Security Association:} identifica una connessione da un host mittente ad un host destinatario. Definisce perciò l'architettura della comunicazione tra hosts.
+    \item \textbf{Security Association:} identifica una connessione da un host mittente ad un host destinario. Definisce perciò l'architettura della comunicazione tra hosts.
     \item \textbf{Security Protocols:} protocolli per il trasferimento dei dati che garantiscono specifiche proprietà di sicurezza.
     \item \textbf{Key Management:} protocolli per l’instaurazione della connessione tra due hosts.
 \end{itemize}
@@ -75,7 +75,7 @@ Per i Pacchetti \textbf{protetti da IPsec}, il SPD definisce le modalità di ela
     \item La \textbf{granularità} con la quale devono essere gestiti i pacchetti.
     \begin{itemize}
         \item Un \textbf{singolo Tunnel} condiviso per \textbf{tutte le connessioni}.
-        \item Un \textbf{tunnel} \textbf{per ogni} differente connessione TCP.
+        \item Un \textbf{tunnel} \textbf{per ogni} diferente connessione TCP.
     \end{itemize}
 \end{itemize}
 \end{definition}
@@ -235,7 +235,7 @@ I messaggi hanno il seguente formato:
 \begin{definition}[IKE Msg Format]\label{def:ikemsg}
 \begin{itemize}
     \item \textbf{IKE Header:} indica il tipo di messaggio IKE.
-    \item \textbf{IKE Payloads:} lista collegata di payload differenti. Ogni singolo payload possiede un proprio formato ed una propria funzione. Tale \textbf{struttura flessibile} permette di \textbf{estendere} rapidamente un \textbf{messaggio} IKE e, di fatto, le \textbf{funzionalità} del \textbf{protocollo IKE} stesso.
+    \item \textbf{IKE Payloads:} lista collegata di payload differenti. Ogni singolo payload possiede un proprio formto ed una propria funzione. Tale \textbf{struttura flessibile} permette di \textbf{estendere} rapidamente un \textbf{messaggio} IKE e, di fatto, le \textbf{funzionalità} del \textbf{protocollo IKE} stesso.
 \end{itemize}
 \begin{remark}
 Questi messaggi sono trasportati tramite \textbf{UDP}, \textbf{reso affidabile} dal protocollo IKE stesso, ed \textbf{inviati} tramite protocollo IP.
@@ -272,7 +272,7 @@ Viene \textbf{introdotto} un \textbf{version flag $V$} in \textbf{tutti} i messa
 \begin{definition}[IPsec Version Flag]\label{def:versionflag}
 \begin{itemize}
     \item \textbf{$V=0$} se il \textbf{mittente} del messaggio sta \textbf{negoziando} la propria \textbf{versione massima}.
-    \item \textbf{$V=1$} altrimenti, ovvero se il \textbf{mittente} del messaggio sta \textbf{negoziando} una \textbf{versione inferiore alla propria versione massima disponibile.}
+    \item \textbf{$V=1$} altriment, ovvero se il \textbf{mittente} del messaggio sta \textbf{negoziando} una \textbf{versione inferiore alla propria versione massima disponibile.}
 \end{itemize}
 \end{definition}
 Un attaccante MITM può modificare sia la versione che il version flag all'interno dei messaggi di IKE SA Init per effettuare un downgrade. Tuttavia, l'attaccante non potrà alterare i messaggi di IKE SA Auth nel quale è contenuto il version flag realmente dichiarato, poiché protetti tramite criptazione e autenticazione.\\

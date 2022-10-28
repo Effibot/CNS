@@ -43,7 +43,7 @@ Supponiamo che un attaccante possa intercettare la coppia $(MSG,TAG)$ di un Send
     \item l'attaccate non deve essere in grado di alterare il tag, in modo tale che $tag'=H(K,M')$ senza conoscere $K$
     \item L'attaccante non deve essere capace di cambiare $M$ in $M'$ in modo tale che \[H(K,M)==H(K,M')\]
 \end{itemize}
-Poiché non è possibile prevenire un MITM, il tag fornisce un valido aiuto nell'intercettare un attacco in corso o avvenuto, in quanto il tag risulterà alterato.
+Poiché non è possibile prevenire un MITM, il tag fornisce un valido aiuto nell'intercettare un attacco in corso o avvenuto, in quanto il tag risultarà alterato.
 \subsection{Vulnerabilità ai Reply Attacks}
 I reply attacks consistono nel seguente schema: se vengono mandati due messaggi identici, i tag risultanti saranno identici.
 \begin{proposition}\label{prop:macreplay}

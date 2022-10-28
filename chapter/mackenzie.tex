@@ -74,7 +74,7 @@ Un attaccante in possesso del device potrebbe vedere soltanto i valori di $v,a$ 
 Le vulnerabilità aperte su questo schema sono due:
 \begin{itemize}
     \item \textbf{L'attaccante viene in possesso di $SK_D$:} in questo caso è possibile ad esempio disconnettere il device dalla rete e accedere a tutto.
-    \item \textbf{device rubato e password predicibile}: prima o poi sarà possibile accedere alla secret-key facendo brute-forcing.
+    \item \textbf{device rubato e password predicibile}: prima o poi sarà possibile accedere alla secre-key facendo brute-forcing.
 \end{itemize}
 Negli altri casi siamo protetti:
 \begin{itemize}
@@ -133,7 +133,7 @@ Sia $m$ il messaggio da firmare, \textbf{ogni volta} che avviene una transazione
     \end{enumerate}
 \end{corollary}
 \begin{note}
-La \textbf{signature-key} $d$ \textbf{non è mai} trasmessa in chiaro. Pertanto, se un attaccante ottiene \textbf{sia} la password \textbf{che} il device, non può ottenere $d$ e firmare messaggi come fosse il proprietario.
+La \textbf{signature-key} $d$ \textbf{non è mai} trasmessa in chiaro. Pertanto, se un attaccante ottiene \textbf{sia} la password \textbf{che} il device, non può ottenere $d$ e firmare messagi come fosse il proprietario.
 \end{note}
 Con questo metodo, possiamo ampliare il protocollo con una funzione di disattivazione:
 \begin{corollary}[Threshold SS for Capture-Protection: Key Disabling]\label{def:keydis}

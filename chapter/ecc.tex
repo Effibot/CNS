@@ -1,5 +1,5 @@
 \chapter{Elliptic Curve Cryptography}
-Abbiamo visto come la sicurezza può essere affidata ad aspetti computazionali o logici (per teoremi matematici ecc). Per quanto riguarda la \textit{computational security} abbiamo osservato due principi fondamentali: \textbf{Discrete-Logarithm} (\cref{prop:disclog}) e \textbf{Prime-Factorization} (\cref{prop:prodfact}).\\
+Abbiamo visto come la sicurezza può essere affidata ad aspetti computazionali o logici (per teoremi matematici ecc). Per quanto riguarda la \textit{computational securty} abbiamo osservato due principi fondamentali: \textbf{Descrete-Logarithm} (\cref{prop:disclog}) e \textbf{Prime-Factorization} (\cref{prop:prodfact}).\\
 E' stato osservato che a seconda del gruppo usato nella crittografia, questi problemi possono essere più o meno complessi da risolvere. In particolare, alcuni dati sul tempo usato per risolvere il problema di \textbf{DLog} sono i seguenti:
 \begin{itemize}
     \item \textbf{Dlog in $Z^*(p)$:} $\exp{O(n^{\frac{1}{3}})}$.
@@ -81,7 +81,7 @@ Siano $P=(x_1,y_1),Q=(x_2,y_2)$. Allora $R=P+Q=(x_3,y_3)$. Allora:
 \end{equation}
 \end{theorem}
 \begin{proof}
-Siano $P=(x_1,y_1),Q=(x_2,y_2)$. Allora $R=P+Q=(x_3,y_3)$.
+Siano $P=(x_1,y_1),Q=(x_2,y_2)$. Allora $R=P+Q=(x_3,y_3)$.\\
 \begin{itemize}
     \item $P\ne Q$: l'equazione della retta passante per due punti è:
     \begin{equation}\label{eq:rect}
@@ -189,7 +189,7 @@ Consideriamo un client $C$ e un server $S$ che vogliono stabilire una chiave per
 \end{enumerate}
 Vengono usate curve su numeri primi a 256 e 384 bit.
 \begin{remark}
-I prodotti sono intesi come somma ripetuta, seguendo la definizione di somma su curve ellittiche (\cref{def:ecsum}).
+I prodotti sono intesi come somma ripetuta, seguendo la definzione di somma su curve ellittiche (\cref{def:ecsum}).
 \end{remark}
 \begin{remark}
 Le due entità si scambiano \textbf{punti della curva ellittica}, senza mai rivelarla.
@@ -219,9 +219,9 @@ per quanto riguarda l'algoritmo di firma digitale, vediamo come funziona un proc
 \begin{itemize}
     \item Calcolo $u_1=s^{-1}H(m)\bmod q$.
     \item Calcolo $u_2=s^{-1}r\bmod q$.
-    \item Verifico che: $[(g^{u_1}e^{u_2})\bmod p]\bmod q=r$, dove $e=g^d$. In questo modo stiamo calcolando:
+    \item Verifico che: $[(g^{u_1}y^{t_2})\bmod p]\bmod q=r$, dove $y=g^d$. In questo modo stiamo calcolando:
     \[
-    g^{\frac{k}{H(m)+rd}H(m)}\cdot g^{d\frac{k}{H(m)+rd}r}=g^{\frac{k(H(m)+rd)}{H(m)+rd}}=g^k\bmod{p}
+    g^{\frac{k}{H(m)+rd}H(m)}\cdot g^{d\frac{k}{H(m)+rd}r}=g^{\frac{k(H(m)+rd)}{H(m)+rd}}=g^k
     \]
 \end{itemize}
 \end{definition}
@@ -239,7 +239,7 @@ Supponiamo di poter conoscere il prossimo della nonce $k$ usato per un messaggio
     s=k^{-1}[H(m)+rd]&\longrightarrow sk=H(m)+rd\\
     d&=[sk-H(m)]r^{-1}
 \end{align*}
-La chiave privata è ora nota all'attaccante.
+La chiave privata è ora nota all'attacante.
 \end{corollary}
 Se la nonce dovesse invece ripetersi?
 \begin{corollary}[Repeated Nonce in DSA]\label{cor:krep}
@@ -274,7 +274,7 @@ Esponiamo ora la versione di DSA sulle curve ellittiche:
     \item Scelgo $E(\mathcal{Z}_p)$, con $p$ primo, $n$ (primo, \textbf{grande}) l'ordine del gruppo, $P$ il generatore del gruppo.
     \item Calcolo $Q=[d]P$, con $d$ chiave privata presa come numero \textbf{intero} $[1,n-1]$ e $Q$ la chiave pubblica.\\
     \begin{remark}
-    La chiave privata è un intero, la pubblica è un punto della curva.
+    La chiave pubblica è un intero, la privata è un punto della curva.
     \end{remark}
 \end{itemize}
 \textbf{Per firmare eseguo:}
@@ -284,14 +284,14 @@ Esponiamo ora la versione di DSA sulle curve ellittiche:
     \item Per evitare che le coordinate siano \textbf{fuori dall'ordine del gruppo}\footnotemark calcolo:
     \[r=x_1\bmod n\]
     \footnotetext{\textsuperscript{\thefootnote}L'ordine del gruppo può essere più piccolo, pari o maggiore di $p$, per questo è necessario. Tuttavia, nel 99\% dei casi non si applica mai poiché $n$ non è quasi mai maggiore di $p$.}
-    \item Calcolo la firma come: $s=k^{-1}(H(m)+rd)\bmod{n}$.
+    \item Calcolo la firma come: $s=k^{-1}(H(m)+rd)$.
     \item Invio $\{m,r,s\}$
 \end{itemize}
-\textbf{Per verificare eseguo:} (assumendo tutti i calcoli in $\bmod{n}$)
+\textbf{Per verificare eseguo:}
 \begin{itemize}
     \item Dal messaggio $m$ calcolo l'hash $H(m)$.
     \item Da $s$ calcolo: $w=s^{-1}\bmod n=\frac{k}{H(m)+rd}$.
-    \item Calcolo (\textbf{interi}): $u_1=w\cdot H(m)$ e $u_2=r\cdot w$.
+    \item Calcolo (\textbf{interi}): $u_1=H(m)w\bmod n$ e $u_2=rw$.
     \item Calcolo il punto della curva: $u_1P+u_2Q=(u_1+u_2d)P=(x_0,y_0)$. Ovvero:
     \begin{equation*}
         \begin{aligned}

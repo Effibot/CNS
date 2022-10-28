@@ -34,7 +34,7 @@ La firma digitale è un concetto ben diverso, che sfrutta l'ipotesi che le funzi
 \end{equation}
 Questo implica che, in un sistema a \textbf{firma digitale}, abbiamo la seguente proprietà:
 \begin{proposition}[Digital Signature]
-Il meccanismo di firma digitale \textbf{fornisce} sia\textbf{ message integrity} che l’\textbf{autenticazione della sorgente/mittente} (non repudiant). Viene \textbf{realizzato} utilizzando una \textbf{funzione hash crittografica H}, un \textbf{algoritmo di criptazione asimmetrico} e le \textbf{chiavi privata e pubblica del mittente}e, per generare una firma del messaggio. In particolare:
+Il meccanismo di firma digitale \textbf{fornisce} sia\textbf{ message integrity} che l’\textbf{autenticazione della sorgente/mittente} (non repudiant). Viene \textbf{realizzato} utilizzando una \textbf{funzione hash crittografica H}, un \textbf{algoritmo di criptazione asimmetrico} e le \textbf{chiavi privata e pubblica del mittent}e, per generare una firma del messaggio. In particolare:
 \begin{itemize}
     \item Il \textbf{mittente} genera la sua firma $sign_M=Dec_{src}(H(M))$, \textbf{criptando} la sua \textbf{chiave privata} il digest del messaggio M. Invia quindi \{M, $sign_M$\} al destinatario.
     \item Il \textbf{destinatario} legge la firma e \textbf{ottiene} il \textbf{digest} \textbf{decriptando} con la \textbf{chiave pubblica} del \textbf{mittente}.
@@ -250,7 +250,7 @@ Per trovare $x,y$, costruiamo la seguente tabella:
  \hline
     \dots&\dots&\dots&\dots\\
 \hline
-    $x_{i-2}-q_{i-1}\cdot{x_{i-1}}$&$y_{i-2}-q_{i-1}\cdot{y_{i-1}}$&
+    $x_{i-2}-r_{i-1}\cdot{x_{i-1}}$&$y_{i-2}-r_{i-1}\cdot{y_{i-1}}$&
     $rest(q_{i-2}/q_{i-1})$&$q_{i-2}/q_{i-1}$\\
 \hline
     \dots&\dots&\dots&\dots\\
@@ -453,7 +453,7 @@ Possiede il seguente formato:
 \begin{itemize}
     \item \textbf{Emittente (Issuer):} Indica la CA che ha \textbf{pubblicato} la lista.
     \item \textbf{Ultima Data di Aggiornamento:} ultima data in cui la lista è stata modificata.
-    \item \textbf{Prossima Data di Aggiornamento:} data futura in cui verrà pubblicato il prossimo aggiornamento. Indica il periodo di validità della lista.
+    \item \textbf{Prossima Data di Aggiornamento:} data futura in cui verrà pubblicato il prossimo aggiornametno. Indica il periodo di validità della lista.
     \item \textbf{Elenco dei Seriali Revocati:} indica i numeri seriali dei \textbf{certificati da revocare}.
     \item \textbf{Elenco della Data di Revocazione}.
     \item \textbf{Firma Digitale:} firma generata dalla CA emittente della lista.
@@ -491,7 +491,7 @@ Attualmente vanno dal numero 1 al numero 15, alcuni di questi sono:
     \end{enumerate}
     \end{proposition}
     \item \textbf{PKCS\#11:} \textbf{CTIS (Cryptographic Token Interface Standard)}. Specifica l'API per \textbf{firmare e verificare} dati da parte di un dispositivo che mantiene chiavi.
-    \item \textbf{PKCS\#12:} \textbf{PIESS (Personal Information Exchange Syntax Standard)}. Specifica il \textbf{formato} dei file utilizzati per \textbf{memorizzare i certificati} e le \textbf{chiavi private} usati per spostare informazioni riservate tra diversi browsers.
+    \item \textbf{PKCS\#12:} \textbf{PIESS (Personal Information Exchange Syntax Standard)}. Specifica il \textbf{formato} dei file utilizzati per \textbf{memorizzzare i certificati} e le \textbf{chiavi private} usati per spostare informazioni riservate tra diversi browsers.
     \item \textbf{PKCS\#13:} \textbf{ECC (Elliptic Curve Cryptography)}
 \end{itemize}
 \subsection{Certificate Chains}
