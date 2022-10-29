@@ -2,7 +2,7 @@
 L'obiettivo dei Block Ciphers è quello di fornire dei meccanismi più "generali" di cifratura rispetto ai substitution ciphers. Lo schema base di un cifratore a blocchi è il seguente:
 \begin{figure}[h]
     \centering
-    \includegraphics{image/blockcipher.png}
+    \includegraphics[width=\linewidth]{image/blockcipher.png}
     \caption{Block Cipher Scheme}
     \label{fig:blkcipher}
 \end{figure}
@@ -15,20 +15,25 @@ L'idea alla base dei block cipher è quella di dividere il messaggio in blocchi 
 \end{itemize}
 \end{property}
 Il problema di avere una funzione biettiva, è che se un messaggio una volta diviso in blocchi presentasse due blocchi uguali, avremmo uno stesso testo cifrato per quei due blocchi. Stesso discorso se cifriamo due volte lo stesso messaggio.\\
-Questo è il funzionamento della modalità \textbf{ECB} \textit{(Electronic Code Book)} , che non va mai usato perché \textbf{perdiamo semantic security}.\\
+Questo è il funzionamento della modalità \textbf{ECB} \textit{(Electronic Code Book)} , che non va mai usato perché \textbf{perdiamo semantic security}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{image/shortcycle.png}
+    \caption{PRP function for 3-bit blocks}
+    \label{fig:shortcycle}
+\end{figure}
 \begin{remark}Supponiamo di avere una chiave di dimensione $n=3$bit. L'insieme di tutti i plaintext possibili è di dimensione 8, quindi le permutazioni possibili sono $2^3!=8!=40320$.\\
 Se consideriamo \textit{AES} la dimensione della chiave è di 128 bit, quindi il numero di permutazioni è incredibilmente elevato. 
 \end{remark}
-\begin{note}In realtà in \textit{AES} le permutazioni sono di meno, perché vengono richieste delle proprietà aggiuntive.
-\end{note}
+\begin{remark}In realtà in \textit{AES} le permutazioni sono di meno, perché vengono richieste delle proprietà aggiuntive.
+\end{remark}
 Una possibile soluzione per ovviare al problema descritto sopra è ovviamente quello di inserire degli \textit{initialization vectors} per nascondere il plaintext al momento dell'applicazione della funzione di \textbf{PRP} \textit{(pseudorandom permutation)} secondo il seguente schema:
-\pagebreak
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/blockiv.png}
+    \includegraphics[width=\linewidth]{image/blockiv.png}
     \caption{Block Cipher with IV}
     \label{fig:blockiv}
-\end{figure}\\
+\end{figure}
 Le proprietà che adesso dobbiamo richiedere per gli IV sono due:
 \begin{theorem}[Semantic Security for ECB]
 Se le seguenti proprietà sono soddisfatte abbiamo sicurezza semantica \textit{ECB}.
@@ -50,10 +55,10 @@ L'inconveniente è che dobbiamo trasmettere un messaggio di dimensione doppia: n
 \end{theorem}
 \section{Modes of Operations}
 I block ciphers vengono suddivisi in categorie in base alla loro \textit{"Modalità di Operazione"}. Le più usate sono \textbf{CBC} e \textbf{CTR} mentre quelle consigliate da usare sono \textbf{CFB} e \textbf{OFB} per alcune particolari proprietà. Ci sono anche due modalità avanzate che forniscono \textit{authenticated encryption}: \textbf{GCM} e \textbf{OCB}.
-\begin{note}
+\begin{remark}
 Ricordiamo che il problema fondamentale è che gli IV non devono mai ripetersi, quindi è necessario ridurne la generazione, oltre che l'overhead sulla trasmissione.
-\end{note}
-\pagebreak
+\end{remark}
+
 \subsection{Cipher Block Chaining: CBC}
 Questa modalità si basa su un sistema di block-chain descritto nel modo seguente:
 \begin{definition}[Encryption with Cipher Block Chaining Mode]\label{def:cbcenc}
@@ -77,7 +82,7 @@ Tuttavia le \textbf{cifrature} \textbf{non} sono \textbf{parallelizabili} in qua
 \end{algorithmic}
 \end{definition}
 Osserviamo che il discorso sulla parallelizzazione non sussiste per la decrittazione, in quanto con il solo IV e il messaggio è possibile decifrare tutto il ciphertext in parallelo.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{image/cbcenc.png}
@@ -91,18 +96,18 @@ Osserviamo che il discorso sulla parallelizzazione non sussiste per la decrittaz
     \end{subfigure}
     \caption{CBC Mode}
 \end{figure}
-\begin{note}
+\begin{remark}
 CBC è il sistema più comune e usato per cifrare dei messaggi, ma è sicuro sempre se e solo se la nonce è \textbf{truly random e non predicibile}.
-\end{note}
+\end{remark}
 \begin{remark}
 IV predicibili possono portare a CPA, come successo in \textbf{BEAST} nel 2011.
 \end{remark}
-\begin{note}
+\begin{remark}
 L'implementazione di CBC richiede due circuiti differenti per cifrare e decifrare i messaggi. Poiché questi meccanismi sono spesso inseriti a livello hardware, usare due circuiti significa usare il doppio dello spazio per la realizzazione del sistema di cifratura.
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 Poiché lo xor impone che le dimensioni dei chunk siano di un numero fissato, è necessario fare un padding per messaggi che non sono multipli del numero di byte scelto. Il padding viene calcolato secondo degli standard, un esempio è \textbf{PKCS\#7}.
-\end{note}
+\end{remark}
 \subsection{Cipher Feedback Mode e Output Feedback Mode}
 Le modalità CFB e OFB offrono un punto di vista differente rispetto a CBC. In particolare, tendono ad imitare gli stream ciphers, producendo un keystream utile alla cifratura del plaintext, permettendo di usare un solo circuito, sia per \textit{PRP} che per \textit{PRP\textsuperscript{-1}}.
 \begin{definition}[Cipher Feedback Mode - CFB [Encryption]]\label{alg:cfb}
@@ -152,7 +157,6 @@ Per fare decryption è possibile usare lo stesso circuito di encryption, dove \t
 \EndFor
 \end{algorithmic}
 \end{definition}
-
 \begin{figure}[h]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
@@ -167,7 +171,7 @@ Per fare decryption è possibile usare lo stesso circuito di encryption, dove \t
     \end{subfigure}
     \caption{Cipher Feedback Mode}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{image/ofbenc.png}
@@ -187,12 +191,6 @@ I cifratori a blocchi dipendono fortemente dal blocco di encryption che calcola 
 Condizione per la quale un algoritmo di cifratura, a partire da alcune specifiche condizioni iniziali, tendono a ripetere i valori di ciphertext dopo poco tempo.
 \end{definition}
 \begin{example} Consideriamo l'insieme $S$ e la permutazione seguente $\prod$.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{image/shortcycle.png}
-    \caption{PRP function for 3-bit blocks}
-    \label{fig:shortcycle}
-\end{figure}
 \begin{enumerate}
     \item \textbf{OFB} con $IV=010$: $C=010\,111\,100\,001$ \textcolor{red}{$010\,111\,\dots$}\\
     I valori di $C$ cominciano a ripetersi dopo 5 iterazioni.
@@ -208,9 +206,9 @@ Condizione per la quale un algoritmo di cifratura, a partire da alcune specifich
 \section{Counter Mode}
 Poiché le modalità precedenti sono soggette allo \textit{short cycle problem} una modalità resistente è necessaria. In particolare, poiché il problema è intrinseco all'\textit{IV} scelto per avviare la cifratura, se questo fosse sviluppato dinamicamente e sempre diverso, non potremmo avere cicli all'interno di una sequenza di cifratura.\\
 Assumendo l'\textit{IV} come un \textbf{contatore} incrementato ad ogni nuovo blocco, è possibile dimostrare che se la PRP è sicura, allora il risultato pseudorandomico generato è sicuro.
-\begin{note}
+\begin{remark}
 La modalità \textit{CTR} gode della maggior parte dei vantaggi:
-\end{note}
+\end{remark}
 \begin{enumerate}
     \item [\textcolor{green}{\checkmark}]Trasforma i block-cipher in stream-cipher.
     \item [\textcolor{green}{\checkmark}]Combina i vantaggi di \textit{CFB}(\cref{alg:cfb}) e \textit{OFB}(\cref{alg:ofb}).
@@ -232,9 +230,9 @@ La modalità \textit{CTR} gode della maggior parte dei vantaggi:
 \end{algorithmic}
 \footnotetext{\textsuperscript{\thefootnote}Ad esempio AES-CTR specifica che per l'\textbf{Initial Counter Block} il contatore è formato \textbf{da 128bit} dove i \textbf{primi 96} sono costituiti dall'\textbf{IV} e i \textbf{restanti 32} dal \textbf{contatore}, \textbf{partendo da 1}.}
 \end{definition}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/blkctr.png}
+    \includegraphics[width=\linewidth]{image/blkctr.png}
     \caption{Counter Mode Block Cipher}
     \label{fig:ctrmode}
 \end{figure}

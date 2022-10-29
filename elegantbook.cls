@@ -279,7 +279,7 @@
 
 \RequirePackage{graphicx}
 \setkeys{Gin}{width=\textwidth}
-%\RequirePackage{enumerate}
+\RequirePackage{enumerate}
 \RequirePackage{amsmath,mathrsfs,amsfonts,amssymb}
 \providecommand\qed{}
 \renewcommand{\qed}{\hfill\ensuremath{\square}}
@@ -288,7 +288,6 @@
 
 \RequirePackage{fancyvrb}
 \RequirePackage{makecell,lipsum,hologo}
-%%中文结构名字
 
 \RequirePackage[
   backend=biber,

@@ -6,7 +6,7 @@ Quando vogliamo cifrare il contenuto di un messaggio in chiaro (\emph{plaintext}
     \includegraphics[width=\textwidth]{image/enc_exemple.png}
     \caption{Schema di Crittografia Standard}
     \label{fig:enc_exemple}
-\end{figure}\\
+\end{figure}
 La cifratura è una tecnica che serve \textbf{proteggere la confidenzialità dei dati} trasformandoli in qualcosa di incomprensibile ad un interprete generico. Come indicato nella \cref{fig:enc_exemple}, \textbf{la trasformazione} messa in atto da un cifratore \textbf{deve essere reversibile}, in modo tale che il destinatario del messaggio cifrato sappia ritrasformare il testo cifrato per poterlo leggere. Al fine di fare ciò, entrambe le parti devono conoscere due fattori:
 \begin{enumerate}
     \item \textbf{Chiave:} la chiave è l'informazione che \textbf{deve} essere segreta e condivisa solo ed esclusivamente tra il mittente e il destinatario. Può essere di tipo \textbf{simmetrico} se viene usata la stessa chiave per cifrare e decifrare il messaggio, \textbf{asimmetrica} altrimenti. 
@@ -39,7 +39,7 @@ Il vernam cypher è considerato il meccanismo di cifratura \emph{perfetto} in qu
 \end{enumerate}
 \begin{corollary}[Lo scopo della crittografia]
 Quando criptiamo un messaggio dobbiamo ragionare in ottica di \textbf{mettersi in sicurezza da una minaccia specifica}, piuttosto che da un pericolo in generale.
-\end{corollary}\pagebreak
+\end{corollary}
 \section{Confidentiality, Integrity, Availability}
 I principi alla base della cifratura e della crittografia sono i seguenti:
 \begin{definition}[Confidentiality]\label{def:confidentiality}
@@ -68,7 +68,7 @@ Tipicamente un \emph{TAG} è composto da:
 Il messaggio contenente il segreto viene cifrato tramite $\oplus$ con la chiave associata all'utente.\\
 Il \emph{READER} invece detiene un database con le chiavi degli utenti a cui fare riferimento.\\
 Quando il \emph{TAG} viene a contatto con il \emph{READER}, quest'ultimo sarà in grado di decifrare il messaggio qualora fosse genuino, trovando un riscontro con qualche entry del database.\\
-In questo sistema, ogni chiave è generata \textbf{pseudo-randomicamente} a partire dalla chiave precedente. Una volta ottenuto il segreto, il \emph{READER} associa una nuova chiave temporanea al \emph{TAG} in questione, aggiornando il suo database.\\\pagebreak
+In questo sistema, ogni chiave è generata \textbf{pseudo-randomicamente} a partire dalla chiave precedente. Una volta ottenuto il segreto, il \emph{READER} associa una nuova chiave temporanea al \emph{TAG} in questione, aggiornando il suo database.
 \begin{remark}
 In un \emph{RFID} il segreto viene criptato usando una \emph{pseudo-random key}.
 \end{remark}
@@ -79,14 +79,13 @@ Tale sistema presenta due problemi. Supponiamo che $S$ sia truly random e $K$ ps
 \end{itemize}
 Poiché l'algoritmo pseudo-random per generare la chiave è noto, è possibile dedurre tutte le possibili combinazioni di bit che costituiscono $K$. Pertanto, facendo uno \emph{xor} tra due messaggi consecutivi, è possibile ottenere un testo con cui fare \emph{xor} con una delle due chiavi, ottenendo delle combinazioni possibili per il plain-text originale.\\
 Dato che $M_1\oplus{M_2}=7$, supponendo che $K_i=3,\,k_{i+1}=4$, confrontando con la mappa delle chiavi pseudo-random è possibile dedurre sia chiave, che messaggi che lo schema con cui vengono generate le chiavi.
+\end{example}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{image/rfid_example.png}
     \caption{Esempio di scambio messaggi in RFID}
     \label{fig:rfid_example}
 \end{figure}
-
-\end{example}\pagebreak
 \section{Indistinguishability under Chosen Plaintext Attack}
 Definire un \emph{"cifratore sicuro"} è generalmente difficile, in quanto una buona definizione deve tenere in considerazione la minaccia rispetto alla quale è considerato sicuro. Tipicamente viene adottata infatti la convenzione \textit{\textbf{Goal-Model}}.\\
 Poiché un tipo di attacco è il cosiddetto \textbf{\textit{Chosen Plaintext Attack} (CPA)} una definizione che possiamo dare è che sia di tipo \textbf{IND-CPA}, ovvero, non deve rilasciare informazioni ad un'entità malevola quando questa possa attaccare il sistema sfruttando un plaintext scelto. Facciamo un esempio:

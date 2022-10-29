@@ -25,10 +25,10 @@ Siamo costretti a \textbf{raddoppiare} la \textbf{dimensione} del testo che invi
     \caption{ElGamal scheme}
     \label{fig:elgam}
 \end{figure}
-\begin{note}
+\begin{remark}
 Nell'esempio possiamo vedere come lo schema è molto simile a DH, in quanto $g^s,g^r$ sono i coefficienti pubblici (rispettivamente per la chiave privata e per il ciphertext). $s,r$ sono segreti noti esclusivamente al ricevente e al trasmittente rispettivamente, quindi \textbf{non c'è modo} per chiunque di ricostruire $g^{sr}$.\\
 Tra l'altro, $r$ è un segreto \textbf{effimero} che viene generato \textit{on-the-fly}.
-\end{note}
+\end{remark}
 \section{Asymmetric Ciphers and Hybrid Encryption}
 \begin{wrapfigure}{r}{0.4\textwidth}
 \centering
@@ -104,7 +104,7 @@ Uno dei sistemi di firma che possono essere fatti è tramite RSA, vediamone lo s
     \item \textbf{Controllo la firma:} \{$H(M)=(H(m)^d)^e$\}
 \end{enumerate}
 \end{definition}
-\pagebreak
+
 Per estendere questo schema ad uno a soglia, potremmo procedere con il solito approccio:
 \begin{enumerate}
     \item Come dealer, genero un polinomio $f(x)$ tale che $f(0)=d$.
@@ -124,9 +124,9 @@ Tuttavia, il funzionamento di RSA è dovuto al fatto che l'esponenziale è calco
 \begin{remark}
 Se il termine $\beta$ fosse pari, non potremmo neanche calcolare l'inversa modulare.
 \end{remark}
-\begin{note}
+\begin{remark}
 Uno schema (n,n), non avendo la frazione (no termine di Lagrange), avrebbe funzionato.
-\end{note}
+\end{remark}
 Vediamo una soluzione al problema, proposta da Victor Shoup\footnotetext{\href{https://www.iacr.org/archive/eurocrypt2000/1807/18070209-new.pdf}{Victor Shoup - RSA Threshdol}}:
 Consideriamo uno scenario con $L$ player e assumiamo come sempre che lo share sia del tipo $x_i=i$. La base di lagrange che andrà calcolata nel caso di uno schema $(L,L)$ sarà del tipo:
 \begin{equation}\label{eq:lbasersa}
@@ -148,8 +148,8 @@ Come \textbf{Dealer}:
 \end{enumerate}
 Come \textbf{Verifier} per ricostruire la firma faccio:
 \[\prod H(m)^{y_i\overline{\Lambda}_{x_i}}=H(m)^{L!\sum y_i\Lambda_{x_i}}=H(m)^{d\cdot L!}\bmod{N}\]
-\begin{note}
-\textbf{Problema: la firma creata non è la firma}, ma la firma \textbf{elevata} ad una \textbf{costante}, $L!$. \textbf{Potremmo} decidere di dividere per la stessa costante, ma torneremmo al caso precedente, introducendo il calcolo dell'inversa in modulo $\phi(N)$, che \textbf{non possiamo fare}.\end{note}
+\begin{remark}
+\textbf{Problema: la firma creata non è la firma}, ma la firma \textbf{elevata} ad una \textbf{costante}, $L!$. \textbf{Potremmo} decidere di dividere per la stessa costante, ma torneremmo al caso precedente, introducendo il calcolo dell'inversa in modulo $\phi(N)$, che \textbf{non possiamo fare}.\end{remark}
 \subsection{RSA Common Modulus Attack}
 La nota scritta prima non è necessariamente vera, poiché l'approccio "alla Shoup" descritto prima non è completo.\\
 Introduciamo innanzitutto una vulnerabilità di RSA: 
@@ -206,10 +206,10 @@ Poiché vogliamo $H(m)=y$ e $H(m)=y^e$ è noto, usando l'attacco \cref{thm:rsaco
 \end{definition}
 \begin{remark}Se svolgiamo i calcoli sul sottogruppo dei \textbf{Residui Quadratici} (\cref{def:quadres}) e usiamo primi forti (\cref{eq:strongp}) $p=2p'+1,q=2q'+1$ allora il periodo di $N=pq$ sarà $\phi(N)=(p-1)(q-1)=2p'\cdot2q'=4p'q'$. Il periodo spannato da questo numero è \textbf{molto grande}, anche se non è primo. Quindi non c'è il problema di invertire il modulo a meno di voler invertire un numero del tipo $1/p'$ ma non succede praticamente mai.
 \end{remark}
-\begin{note}
+\begin{remark}
 Schoup dimostrò anche la verificabilità del secret sharing fatto con questa tecnica.
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 Il problema che questo schema ha è che \textbf{almeno una} persona nel mondo conosce $\phi(N)$, il Dealer. Questo problema è stato risolto da Foque e Stern, nel 2001. Non lo vediamo, anche perché RSA al giorno d'oggi è obsoleto rispetto ad altri sistemi di sicurezza.
-\end{note}
+\end{remark}
 %\begin{definition}[Elliptic Curve Integrated Encryption Scheme]\label{def:ecies}\end{definition}

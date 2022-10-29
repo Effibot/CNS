@@ -1,5 +1,5 @@
 \chapter{Cellular Authentication}
-Nelle reti cellulari passate\footnotemark (2G, 3G) gli aspetti di sicurezza vennero considerati in modo crescente ma non senza commettere errori e/o tralasciare aspetti fondamentali. Consideriamo qui aspetti e meccanismi di come un utente può autenticarsi in una rete cellulare e di come una stazione radio può confermare di essere valida. 
+Nelle reti cellulari passate\footnotemark(2G, 3G) gli aspetti di sicurezza vennero considerati in modo crescente ma non senza commettere errori e/o tralasciare aspetti fondamentali. Consideriamo qui aspetti e meccanismi di come un utente può autenticarsi in una rete cellulare e di come una stazione radio può confermare di essere valida. 
 \footnotetext{Nella rete 1G la sicurezza non venne considerata affatto.}
 \section{Rete 2G (GSM)}
 In una rete GSM, le principali entità coinvolte in un processo di autenticazione sono le seguenti: 
@@ -12,8 +12,8 @@ Quando un utente entra in rete, si avvia il seguente protocollo di autenticazion
 \begin{proposition}[2G Authentication]\label{prop:2gauth}
 Assumiamo che l'utente abbia già notificato alla SN chi è e dove si trovi.
 \begin{enumerate}
-    \item La SN invia l'\textbf{IMSI}\footnotemark (identificatore dell'utente) e un \textbf{RAND} (sostanzialmente una challenge) alla \textbf{HN}.\footnotetext{\textsuperscript{\thefootnote}International Mobile Subscriber Identity}
-    \item L'HN risponde con \textbf{SRES}\footnotemark (una response di tipo: H(RAND,$K_i$)) tramite un algoritmo $A3$ (una funzione hash) e un \textbf{encription key $K_C$} generata \textbf{dinamicamente} con l'algoritmo $A8$ a partire sempre da $K_i$ e \textbf{RAND}.\footnotetext{\textsuperscript{\thefootnote}Signed Result}
+    \item La SN invia l'\textbf{IMSI}\footnotemark(identificatore dell'utente) e un \textbf{RAND} (sostanzialmente una challenge) alla \textbf{HN}.\footnotetext{\textsuperscript{\thefootnote}International Mobile Subscriber Identity}
+    \item L'HN risponde con \textbf{SRES}\footnotemark(una response di tipo: H(RAND,$K_i$)) tramite un algoritmo $A3$ (una funzione hash) e un \textbf{encription key $K_C$} generata \textbf{dinamicamente} con l'algoritmo $A8$ a partire sempre da $K_i$ e \textbf{RAND}.\footnotetext{\textsuperscript{\thefootnote}Signed Result}
     \item La SN invia un'\textbf{authentication request} al MS inviando una nuova challenge \textbf{RAND} di 128bit.
     \item La MS crea una \textbf{authentication response} \textbf{SRES} da 32bit a partire dalla challenge di 128 e da $K_i$, tramite $A3$.
     \item La SN controlla se gli \textbf{SRES} corrispondono. In caso affermativo, consente l'accesso.
@@ -26,7 +26,7 @@ Concetto \textbf{fondamentale} con cui, a partire da una singola chiave che rest
 \end{definition}
 \begin{figure}[ht]
     \centering
-    \includegraphics{image/2gauth.png}
+    \includegraphics[width=\linewidth]{image/2gauth.png}
     \caption{2G Authentication Scheme}
     \label{fig:2gauth}
 \end{figure}
@@ -40,9 +40,9 @@ Poiché in uno scenario reale un utente può autenticarsi molte volte in un lass
 Inoltre, viene ridotta anche la frequenza con cui una SN e la HN comunicano tra loro, riducendo l'impatto del processo sul traffico generale.
 \subsection{Vulnerabilità delle reti GSM}
 Nelle reti GSM la vulnerabilità principale è data dal fatto che il protocollo è \textbf{unilaterale} verso l'utente:
-\begin{note}
+\begin{remark}
     \textbf{\textit{non abbiamo garanzie}}  sull'autenticità della service network/stazione radio base\footnotemark.
-\end{note}
+\end{remark}
 \begin{proposition}[Rogue BTS Attack]
 I sistemi GSM non supportano \textbf{mutua autenticazione}, rendendo possibile la creazione di una fake BTS con la quale generare dizionari di utenti che provano a connettersi e, volendo, autenticarsi al posto loro.
 \end{proposition}
@@ -57,9 +57,9 @@ Ai tempi di GSM, gli operatori si misero d'accordo per implementare l'algoritmo 
 \begin{remark}
 Mai affidarsi per la sicurezza di algoritmo al fatto che questo possa essere privato perché prima o poi questo verrà bucato. E' fondamentale, invece, affidarsi agli esperti di crittografia e mai implementare soluzioni "fatte in casa".
 \end{remark}
-\begin{note}
+\begin{remark}
 Riguardo alla dimensione effettiva del digest della chiave $K_c$, vennero standardizzati 64bit, suddivisi in 54 bit veramente sotto specifiche e una serie di zeri, in quanto a quei tempi nessuno era in grado di realizzare un attacco brute-force su una chiave di 54 bit (tantomeno su 64) se non i governi stessi, dotati di mezzi di calcolo più performanti.
-\end{note}\pagebreak
+\end{remark}
 \section{Rete 3G (UMTS)}
 Nella rete UMTS l'autenticazione è bilaterale \textit{(Mutual Auth \cref{chap:mutualauth})} e garantisce che i parametri usati nel processo siano sempre nuovi, evitando il riutilizzo di chiavi. Lo schema è il seguente:
 \begin{proposition}[3G Authentication - AKA: Authentication and Key Agreement]\label{prop:3gauth}
@@ -93,17 +93,17 @@ Assumiamo che l'utente abbia già notificato alla SN chi è e dove si trovi.
     \item La SN confronta \textbf{RES} ed \textbf{XRES}, autenticando MS in caso affermativo.
 \end{enumerate}
 \end{proposition}
-\begin{note}
+\begin{remark}
 Gli algoritmi implementati all'interno della SIM sono $f_1,f_2,f_3,f_4.f_5$. Questi algoritmi sono \textbf{pubblici} e servono per derivare le chiavi necessarie all'autenticazione, tranne il primo che costituisce una funzione di criptaggio\footnotemark\, e il secondo che è sostanzialmente una funzione hash.
 \footnotetext{$f_1$ è detta: \textbf{\textit{Actual Proof of Knowledge}} e certifica la conoscenza della chiave.}
-\end{note}\pagebreak
+\end{remark}
 \begin{remark}
 E' interessante osservare come il protocollo di \textbf{mutua autenticazione} usato \textbf{per validare la rete} è sostanzialmente basato su \textbf{un singolo messaggio}, quando ci aspetteremmo un protocollo di tipo \textit{3-way handshake} (3 messaggi). Analogamente, il meccanismo di \textbf{autenticazione del MS rispetto alla SN avviene come nella rete 2G} (\cref{prop:2gauth}).
 \end{remark}
-\begin{note}
+\begin{remark}
 E' bene specificare che l'autenticazione della HN nei confronti della MS avviene tramite \textbf{sequence number (SQN)}, mantenuto in sincronizzazione tra le diverse parti della rete\footnotemark\, come \textbf{\textit{nonce implicita}}. Questo evita l'invio di un'ulteriore challenge da parte del MS alla HN.
 \footnotetext{La Home Network mantiene il suo contatore nella variabile \textbf{SQN-HE}.}
-\end{note}
+\end{remark}
 \begin{corollary}[Il ruolo dell'Anonymity Key]
 L'AK viene utilizzata per \textbf{oscurare/mascherare}\footnotemark il sequence number in una fase in cui il \textbf{servizio di confidenzialità} non è ancora attivo. Ciò permette di risolvere il \textbf{Location Privacy Problem}, per il quale un attaccante può essere in grado di \textbf{determinare gli spostamenti di un utente tracciando incrementi del sequence number nella rete}.
 \footnotetext{\textsuperscript{\thefootnote}Tramite $\oplus$.}
@@ -119,6 +119,6 @@ Per evitare che l'IMSI venga catturato, forzandone un invio ripetuto magari tram
 % inserire fig su schema reti cellulari wireless dopo esonero
 \subsection{(Pochi) Dettagli su Rete 4G/5G (LTE)}
 La rete 4G (LTE) sfrutta lo stesso principio di autenticazione della rete 3G (UMTS), mentre la rete 5G sfrutta meccanismi molto più simili alle reti wi-fi, in quanto si pone l'obiettivo di fondere le tecnologie ed unificare le reti. 
-\begin{note}[Riguardo 5G]\\
+\begin{remark}[Riguardo 5G]
 Il meccanismo di \textbf{key-derivation} è migliorato. I moduli che dovrebbero garantire integrità in realtà non sono sempre implementati in quanto aggiungono molto carico di lavoro ed è stato fatto solo dal 4G in poi. Vi è inoltre una netta separazione per garantire protezione, detta \textbf{Security Edge Protecion} per separare la Serving Network dalla Home Network
-\end{note}
+\end{remark}

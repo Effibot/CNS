@@ -24,14 +24,14 @@ Possiamo vedere l'entropia come il valor medio dell'information content di una v
     H(X)=E[IC(X)]=\sum_{i}^{n}p_i IC_i=-\sum_{i=1}^{n}p_i\log_{2}\left(p_i\right)
 \end{equation}
 \end{corollary}
-\begin{note}
+\begin{remark}
 Per un insieme di $N$ eventi, l'entropia può andare da 0 ad $N$, a seconda della probabilità degli eventi stessi. 
 \begin{itemize}
     \item Se l'entropia è nulla abbiamo un caso di \textbf{"Minima Entropia"}, ovvero l'evento è deterministico.
     \item Se l'entropia è $N$ allora si ha \textbf{"Massima Entropia"} e ogni evento è equiprobabile.
     \item In tutti i casi intermedi, vuol dire che ogni evento non ha la stessa probabilità di accadere.
 \end{itemize} 
-\end{note}\pagebreak
+\end{remark}
 \section{Password vs Segreto}
 Tipicamente le password presentano 4 tipi di problemi diversi, difficilmente risolvibili.
 \begin{definition}[Overload]
@@ -62,7 +62,7 @@ L'entropia vale:
 \begin{example} [ Coppia di bit Biased:] Consideriamo un bit $X_k=\{0,1\}$ i cui valori non sono a frequenza equa, ovvero capitano rispettivamente con probabilità $p_1=\frac{1}{4}$ e $p_2=\frac{3}{4}$
 \[H(X)=-\frac{1}{4}\log_{2}\left(\frac{1}{4}\right)-\frac{3}{4}\log_{2}\left(\frac{3}{4}\right)=0.81\,\text{bit}\]
 Questo significa che ogni bit trasmesso trasporta $0.81$bit di informazione e un'ipotetica sorgente di questo flusso di bit non potrebbe comprimere il suo messaggio più del $19\%$
-\end{example}\pagebreak
+\end{example}
 \begin{example}[ Sequenza di 3 bit Dipendenti:] Consideriamo $X_1,X_2,X_3$ con probabilità $p_k=1/2$ e supponiamo che $X_2,X_3$ assumano lo stesso valore di $X_1$. Questo significa che abbiamo solo due casi possibili e l'entropia sarà:
 \[H(X)=-\frac{1}{2}\log_{2}\left(\frac{1}{2}\right)-\frac{1}{2}\log_{2}\left(\frac{1}{2}\right)=\log_{2}(2)=1\,\text{bit}\]
 Pertanto, solo 1/3 del messaggio trasmesso sarebbe il reale portatore di informazioni.
@@ -79,9 +79,9 @@ Abbiamo quindi capito che se i bit di una sequenza sono indipendenti, l'entropia
 \end{remark}
 \section{Authentication Protocols}
 Un processo di autenticazione non è altro che una prova di conoscenza, nella quale si vuole dimostrare di conoscere una password o un segreto. 
-\begin{note}
+\begin{remark}
 \textbf{Provare la propria conoscenza NON implica, necessariamente, rivelarne il soggetto.}
-\end{note}
+\end{remark}
 \subsection{Password Authentication Protocol (PAP)}
 È l'approccio di autenticazione più semplice possibile e consiste nella trasmissione della password in chiaro sul mezzo di trasmissione, \textbf{all'inizio della sessione} (non viene mai ripetuta finché viene chiusa).
 \begin{proposition}[PAP - Password Authentication Protocol]\label{prop:pap}
@@ -92,13 +92,13 @@ Un processo di autenticazione non è altro che una prova di conoscenza, nella qu
 \end{proposition}
 \begin{figure}[ht]
     \centering
-    \includegraphics{image/pap.png}
+    \includegraphics[width=\textwidth]{image/pap.png}
     \caption{PAP scheme}
     \label{fig:pap}
 \end{figure}
-\begin{note}
+\begin{remark}
 \textbf{In PAP le password sono pre-condivise e trasmesse in chiaro ad ogni nuovo tentativo di autenticazione.}
-\end{note}\pagebreak
+\end{remark}
 E' facile notare che PAP ha delle limitazioni. In particolare:
 \begin{itemize}
     \item  E' soggetto a \textbf{eaves-dropping:}la password e l'ID sono trasmessi in clear, se qualcuno ascolta mette a repentaglio la sicurezza. 
@@ -126,13 +126,13 @@ E' necessario porre delle premesse sulla funzione hash usata da CHAP:
 \end{proposition}
 \begin{figure}[ht]
     \centering
-    \includegraphics{image/chap.png}
+    \includegraphics[width=\linewidth]{image/chap.png}
     \caption{CHAP Scheme}
     \label{fig:chap}
 \end{figure}
-\begin{note}
+\begin{remark}
 Poiché abbiamo richiesto che $H(\cdot)$ non sia invertibile, CHAP sfrutta la conoscenza della challenge per consentire l'accesso. Se nella specifica applicazione vengono inviati ulteriori oggetti, l'authenticator dovrà usare anche quelli per calcolare l'hash.
-\end{note}
+\end{remark}
 Questo protocollo presenta diversi pro, ma anche un'importante controindicazione:
 \begin{itemize}
     \item [\textcolor{green}{\checkmark}]CHAP protegge dai \textbf{replay attacks}, a patto che la challenge non si ripeta mai.
@@ -160,9 +160,9 @@ CHAP, usando una \textit{nonce} può fare trasmissione in chiaro poiché la pass
 \begin{proposition}
 PAP risulta la scelta migliore per difendere i database, perché è possibile nascondere le password con una funzione hash forte e salvare direttamente $H(P)$ piuttosto che la password stessa. Se il DB viene rubato, l'unico modo per bucarlo è facendo brute-force.
 \end{proposition}
-\begin{note}
+\begin{remark}
 Usando password hashate la sicurezza dipende dalla scelta della password, che deve essere forte. 
-\end{note}
+\end{remark}
 C'è comunque un modo per proteggere CHAP da attacchi back-end:
 \begin{proposition}[CHAP with Explicit Salt]
 Supponiamo che il database abbia a disposizione una sorta di chiave numerica, detta \textit{\textbf{Salt}}. Nel suo DB, è salvato l'hash del salto con la password precedentemente scambiata: $H(Salt, Password)$.
@@ -177,18 +177,18 @@ Periodicamente e/o se dovesse esserci una falla nella sicurezza, si rigenera il 
 \begin{remark}
 Se un hacker ruba un DB, non può utilizzare la password in quanto è nascosta, ma i dictionary-attack restano comunque validi. 
 \end{remark}
-\begin{note}Se volessimo usare un database hashato, quale sarebbe la funzione hash da utilizzare? Sappiamo che SHA256 è la migliore al momento, ma presenta 2 problemi dal punto di vista di nascondere delle password:
+\begin{remark}Se volessimo usare un database hashato, quale sarebbe la funzione hash da utilizzare? Sappiamo che SHA256 è la migliore al momento, ma presenta 2 problemi dal punto di vista di nascondere delle password:
 \begin{enumerate}
     \item E' estremamente veloce: posso crackare l'intero DB più velocemente.
     \item Esiste hardware molto dedicato e specializzato: al 2021 abbiamo 67 TeraHash/s.
 \end{enumerate}
 Poiché gli attacchi ai DB sono i più comuni, è importante far fronte agli eventuali e successivi brute-force su di essi.
-\end{note}\pagebreak
+\end{remark}
 \section{One Time Password (OTP)}
 Abbiamo visto che PAP è, generalmente, la scelta più inflazionata per autenticare un utente. OTP si basa sull'idea di migliorare PAP per avere una password diversa ad ogni corretto tentativo di autenticazione. 
-\begin{note}
+\begin{remark}
 Per prevenire replay attacks, per ogni utente viene memorizzata una password che corrisponde ad un anello di una catena di hash di password. In questo modo viene usata una password sempre diversa ma il database non viene riempito di password per uno stesso utente.
-\end{note}
+\end{remark}
 \begin{definition}[Hash Chains Password]
 Le password vengono generate applicando più volte una funzione hash a partire dalla password di partenza, garantendo che la password sarà sempre diversa da quella usata in un precedente tentativo di autenticazione terminato con successo.
 \end{definition}
@@ -207,9 +207,9 @@ Non stiamo risolvendo il problema dell'eavesdropping, in quanto una volta interc
     \item L'authenticator controlla se $H(P[N])==P[N+1]$. Se vero, sovrascrive nel DB la password con $P[N]$ e invia un messaggio di avvenuta autenticazione. Altrimenti invia un messaggio di rifiuto.
 \end{enumerate}
 \end{proposition}
-  \begin{note}
+  \begin{remark}
     Durante l'autenticazione i-esima, la password salvata nel DB è $P[i]$, pertanto il controllo sarà: $H(P[i])==P[i-1]$
-    \end{note}
+    \end{remark}
 \begin{remark}
 Capiamo che in OTP, se un tentativo di autenticazione va a buon fine, viene salvata sempre la password \textbf{PRECEDENTE} a quella attualmente presente nel database.
 \end{remark}
@@ -236,21 +236,21 @@ Sul server e sul client è memorizzata una secret-key, la password è calcolata 
 \end{equation*}
 La password generata non è più una catena in quanto ogni volta il contatore cambia e il bitstream da hashare è sempre diverso.
 \end{proposition}
-\begin{note}
+\begin{remark}
 Anche se un attaccante dovesse conoscere $P[N]$, non potrebbe calcolare $P[K,N+1]$.
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 La password n-esima può essere calcolata in modo asincrono, purché sia nota la chiave di partenza.
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 La differenza con il OTP (\cref{prop:otp}) è che la password non è più pre-calcolata in ordine inverso. 
-\end{note}
+\end{remark}
 \begin{proposition}[TOTP - Time based OTP]\label{ prop:totp}
 Simile a HOTP (\cref{prop:hotp}) ma il contatore è il tempo.
 \end{proposition}
-\begin{note}
+\begin{remark}
 Un possibile attacco potrebbe essere effettuato, sfruttando la possibilità che un attaccante possa manipolare il tempo registrato nella macchina, controllando di fatto il token.
-\end{note}
+\end{remark}
 \begin{corollary}
 Come "esperti di sicurezza" vorremmo che un sistema 2FA sia sempre implementato e sempre utilizzato, in quanto rappresenta una protezione aggiuntiva difficilmente aggirabile dato che sfrutta un canale di comunicazione diverso.
 \end{corollary}
@@ -270,7 +270,7 @@ Un possibile modo di fare mutua autenticazione è quello di usare CHAP (\cref{pr
 \begin{remark}
 L'idea di base non pone restrizioni sull'effettiva sequenza di messaggi che devono essere scambiati, questo pone un attaccante in posizione di vantaggio (\cref{fig:chapmutualatk}). Difatti, l'hacker potrebbe inoltrare al server la stessa challenge e lui dovrebbe rispondere con il suo nome e l'hash della challenge. A questo punto l'hacker si è mostrato legittimo per il server e può autenticare la sua identità digitale inoltrando la response precedente. 
 \end{remark}
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\textwidth]{image/chapmutualatk.png}
     \caption{Mutual Auth attack scheme}
@@ -313,6 +313,6 @@ Un modo per impedire che le challenge siano riflesse, è tenere traccia della pr
 Mai usare un algoritmo per un obiettivo che non è quello per cui è stato pensato
 \end{corollary}
 La mutua autenticazione con CHAP è sbagliata di fondo, in quanto è un algoritmo pensato per essere \textit{"Single-Side authentication"}, mentre noi lo stiamo forzando a lavorare in un contesto \textit{"Dual-Side"}. Infatti, i reflection attacks ci sono ogni qualvolta usiamo uno stesso protocollo per autenticare due end-point. 
-\begin{note}
+\begin{remark}
 Un protocollo di mutua autenticazione non può autenticare indipendentemente le due parti, in quanto espone vulnerabilità per il sistema. L'unico modo per eseguire il processo correttamente è quello di \textbf{legare insieme} le due challenge crittografandole in una unica response.
-\end{note}
+\end{remark}

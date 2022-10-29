@@ -9,19 +9,19 @@ Queste osservazioni sono vere sempre, a meno di parlare di AEAD (\ref{def:aead})
 \end{example}
 \begin{example}[ Integrità del One Time Pad]
 Sappiamo che il One Time Pad (vernam cipher) è il miglior cifratore possibile, se le sue ipotesi sono rispettate. Eppure, se un'attaccante modificasse un cipher-text, l'uscita sarebbe diversa. Infatti:
-\begin{figure}[hb]
+\end{example}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{image/vernaminteg.png}
     \caption{Fallimento del Vernam Cipher}
     \label{fig:vernamfail}
 \end{figure}
-\end{example}\pagebreak
 \section{Message Authentication con Chiave Simmetrica}
 Supponiamo che Sender e Receiver conoscano una chiave $K$ usata \textbf{\textit{esclusivamente}} per il servizio di integrità. Vogliamo aggiungere al messaggio un pacchetto che serva da \textbf{integrity check}. Chiamiamo \textbf{\textit{TAG}} questa aggiunta.\\
 Un modo per generare questo TAG è quello di usare una funzione hash che leghi il messaggio da inviare con la chiave, producendo un \textbf{\textit{digest}} che farà appunto da TAG. Poiché la chiave è simmetrica, il ricevitore sarà in grado di generare un suo tag che potrà confrontare con quello inviato dal Sender. Se c'è un matching tra i due tag, allora il messaggio è necessariamente autentico. 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/integrityscheme.png}
+    \includegraphics[width=\linewidth]{image/integrityscheme.png}
     \caption{Integrity Check Scheme}
     \label{fig:intcheck}
 \end{figure}
@@ -77,12 +77,12 @@ Per costruire un MAC abbiamo bisogno di 2 ingredienti:
 \end{enumerate}
 \subsection{Caratteristiche di una Cryptografic Hash Function}
 A meno di non possedere una funzione hash perfetta, ovvero un random oracle, è importante dove posizionare il segreto rispetto al messaggio all'interno della funzione. Tipicamente, lo schema di una funzione hash è questa:
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{image/hashscheme.png}
     \caption{Schema di una Funzione Hash}
     \label{fig:hashscheme}
-\end{figure}\\
+\end{figure}
 Una funziona hash è crittografica se soddisfa tre diverse proprietà, che rendono impossibile per un attaccante creare o modificare/estendere/rimpiazzare il messaggio di partenza per ottenere un digest valido. 
 \begin{theorem}[Preimage Resistance]\label{thm:preimageres}
 Dato il risultato di un hash $Y=H(X)$ è difficile trovare un valore qualsiasi di $X\,:\,H(X)=Y$
@@ -163,16 +163,16 @@ L'algoritmo SHA256 si basa sull'\textit{Iterative Merkle-Damgard Construction}, 
 Prende in input $K$ bit arbitrari, aggiungendo un padding formato da $1$ seguito da tanti $0$ per formare un messaggio di $N\times512$bits. Tra gli ultimi 64 bit, viene inserito un numero corrispondente alla lunghezza del messaggio. Vedi \cref{fig:sha256}\\
 Il digest viene prodotto con un rapporto di compressione di 3:1, fornendo un IV da 256bits in ingresso, che viene elaborato con uno dei blocchi da 512bits. Il risultato della funzione è un blocco di 256bits che viene fornito come IV al prossimo anello della catena.
 \end{definition}
-\begin{note}Gli IV disponibili per SHA256 sono delle costanti ben definite da standard.\end{note}
+\begin{remark}Gli IV disponibili per SHA256 sono delle costanti ben definite da standard.\end{remark}
 Vediamo come cambia il livello di sicurezza in funzione della posizione del segreto:
 \begin{itemize}
     \item \textbf{Segreto alla FINE del messaggio:} l'attaccante potrebbe calcolare una sola volta la prima parte del messaggio e provare tutte le combinazioni possibili per la compressione dell'ultimo blocco. Questo riduce la complessità del brute-force attack e, quindi, della sicurezza. Vedi \cref{fig:secretprecomp}
     \item \textbf{Segreto all'INIZIO del messaggio:} inserire il segreto all'inizio permette di eseguire un message-extension attack. All'attaccante è sufficiente calcolare il padding e la lunghezza (ultime parti del messaggio) ed inserire alla fine un plaintext arbitrario, creando un nuovo chunk tale che riapplicando la funzione di compressione si ottiene un messaggio valido \textbf{non scritto dall'utente}. Vedi \cref{fig:macmsgext}
 \end{itemize}
-\begin{note}
+\begin{remark}
     In questo caso l'attaccante non serve che conosca il segreto per sfruttare la vulnerabilità.
-\end{note}
-\begin{figure}[h]
+\end{remark}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{image/sha256.png}
     \caption{SHA256 hash scheme}
@@ -184,7 +184,7 @@ Vediamo come cambia il livello di sicurezza in funzione della posizione del segr
     \caption{Precomputation con Segreto alla fine}
     \label{fig:secretprecomp}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\textwidth]{image/macmsgext.png}
     \caption{Message Extension Attack example}
@@ -203,19 +203,19 @@ Dove con $K^+$ indichiamo l'estensione della chiave $K$ alla dimensione di block
     \item $\textbf{ipad}=0\times5C=01011100$
 \end{itemize}
 \end{definition}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{image/hmackplus.png}
     \caption{SHA256 Key Extension with Outer Pad}
     \label{fig:hmackplus}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics{image/hmac.png}
+    \includegraphics[width=0.8\linewidth]{image/hmac.png}
     \caption{HMAC-SHA265 construction}
     \label{fig:hmacsha256}
 \end{figure}
 La costruzione di HMAC si basa quindi sul possesso di un singolo segreto che viene messo in xor in due modi diversi, per garantire che le due chiavi usate nell'hashing siano diverse. Sebbene l'inner hash prodotto da $H(K^+\oplus{\text{ipad}}||M)$ sia vulnerabile ad extension attack (\cref{fig:macmsgext}, la costruzione rende impossibile produrre un tag valido perché il digest finale prodotto dai 2 blocchi aggiuntivi non può essere esteso. Inoltre, la complessità per individuare la chiave tramite brute-force è pari a N blocchi più i due aggiuntivi dall'hash esterno. 
-\begin{note}
+\begin{remark}
     HMAC è più sicuro di una generica hash function. Inoltre, anche se la funzione hash presenta dei problemi di collisione, la costruzione risulta ancora sicura, anche se la collisione è calcolabile.
-\end{note}
+\end{remark}

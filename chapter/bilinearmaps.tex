@@ -15,16 +15,16 @@ Siano $G_1,G_2,G_t$ gruppi \textbf{ciclici} dello \textbf{stesso ordine}. Allora
 \begin{remark}
 Le mappe bilineari sono chiamate \textbf{pairings} (accoppiamenti) poiché associano coppie di elementi da $G_1$ e $G_2$ con elementi di $G_t$.
 \end{remark}
-\begin{note}La \cref{def:bilmap} ammette anche mappe \textbf{degeneri}, ovvero che mappano tutto nell'identità di $G_t$.
-\end{note}
+\begin{remark}La \cref{def:bilmap} ammette anche mappe \textbf{degeneri}, ovvero che mappano tutto nell'identità di $G_t$.
+\end{remark}
 Dobbiamo pertanto dare una seconda definizione, che ci dica se una mappa è utilizzabile per i nostri scopi:
 \begin{definition}[Admissible Bilinear Map]\label{def:admbil}
 Sia $e:G_1\times G_2\longrightarrow G_t$ una mappa bilineare e siano $g_1,g_2$ i \textbf{generatori} di $G_1,G_2$ rispettivamente.\\
 La mappa $e$ è \textbf{una mappa bilineare ammissibile} se $e(g_1,g_2)$ \textbf{genera} $G_t$ ed è \textbf{calcolabile in modo efficiente}.
 \end{definition}
-\begin{note}
+\begin{remark}
 A volte questo tipo di mappe vengono denominate con $\hat{e}$, ma noi continueremo ad usare $e$.
-\end{note}
+\end{remark}
 \begin{remark}
 Da questo momento in poi, ogni volta che useremo una mappa si intenderà che è una mappa ammissibile.
 \end{remark}
@@ -32,17 +32,17 @@ Tipicamente, negli schemi crittografici i gruppi $G_1.G_2$ vengono presi uguali,
 \begin{remark}
 Idealmente vorremmo anche cercare una mappa che trasformi $G\times G\longrightarrow G$, ma non ci sono studi in merito e non consideriamo questo caso.
 \end{remark}
-\begin{note}
+\begin{remark}
 Le mappe bilineari tipicamente usate sono quelle di \textbf{Weil} e \textbf{Tate}, estremamente complicate ma non necessitano di essere capite per essere usate.
-\end{note}
+\end{remark}
 Il concetto fondamentale sulle mappe bilineari è come queste influenzano il \textbf{Decisional Diffie-Hellman Problem}:
 \begin{definition}[Decisional Diffie-Hellman Problem]\label{def:ddh}
 Dati $g,g^a,g^b$ e un valore $\alpha$ che con probabilità $1/2$ assume il valore $g^{ab}$ oppure $g^z$, dove $z$ è un numero intero casuale. Indovinare qual è il valore di $\alpha$.\\
 Diremo che un DDH-problem è \textbf{hard}, se senza alcuno strumento la probabilità di indovinare è negligible.
 \end{definition}
-\begin{note}
+\begin{remark}
 Se un attaccante fosse in grado di calcolare $g^{ab}$, ovvero è in grado di \textbf{rompere computational DH} (CDH), allora anche DDH viene rotto. Il viceversa potrebbe non essere vero.
-\end{note}
+\end{remark}
 \begin{example}[ How pairing breaks DDH]
 Supponiamo che un attaccante disponga di $g,g^a,g^b$, che corrispondono a tre punti di una curva ellittica. Avendo a disposizione un pairing del tipo $e(g^a,g^b)=e(g,g)^{ab}=g_t^{ab}$\footnotemark \,che mappa due punti di una curva su un intero modulare, allora DDH è rotto, perché basta controllare che un valore $\alpha=\{g^{ab},g^{z}\}$ abbia lo stesso pairing, ovvero: 
 \[
@@ -51,14 +51,14 @@ e(g,g^{ab})=g^{1\cdot ab}_t&p=\frac{1}{2}\\
 e(g,g^z)=g^z_t&p=\frac{1}{2}
 \end{cases}
 \]
-\begin{note}
+\begin{remark}
 E' importante osservare che \textbf{non è stato calcolato} il valore di $g^{ab}$, ma è stato calcolato $g_t^{ab}$ perché il primo è un punto di una EC, il secondo di $Z_p^*$.
-\end{note}
+\end{remark}
 \end{example}
 \begin{remark}
 L'esempio ci mostra come non è possibile rompere DDH nuovamente, poiché una volta fatto il primo pairing non siamo più in EC e non possiamo tornare indietro.
 \end{remark}
-\footnotetext{E' stata usata la notazione moltiplicativa per il calcolo, dove $\alpha*P=P^\alpha$.}
+\footnote{E' stata usata la notazione moltiplicativa per il calcolo, dove $\alpha*P=P^\alpha$.}
 \subsection{MOV Reduction}
 Ricordiamo il vantaggio di usare le curve ellittiche:
 \begin{property}Se stiamo usando come gruppo $Z^*_P$ per gli algoritmi di cifratura, DH o per risolvere Dlog, allora le \textbf{chiavi} hanno \textbf{dimensione} di 2048bit. Se usiamo \textbf{curve ellittiche}, possiamo \textbf{ridurre} la dimensione a \textbf{256bit}.  
@@ -70,11 +70,10 @@ E portare il problema su un gruppo più debole.\\
 Questo problema è chiamato la \textbf{MOV Reduction} ed è \textbf{lo strumento principale} per rompere l'EC-crypto. 
 \begin{problem}[3-party DH] Consideriamo uno scenario di key-agreement nel quale tre entità voglio stabilire una chiave comune, dove:
 $P_1,P_2,P_3$ hanno a disposizione le coppie $(x,g^x),(y,g^y),(z,g^z)$ (supponendo che il generatore $g$ sia stato precedentemente accordato).
-\begin{note}
+\begin{remark}
 Con schemi crittografici standard non possiamo risolvere il problema.
-\end{note}
+\end{remark}
 Nel 2000, un crittografo francese chiamato Joux, trovò una soluzione applicando tecniche di pairing:
-\begin{solution}
 \begin{theorem}[Joux's 3-party DH]\label{thm:dh3}
 Siano $X,Y,Z$ tre entità che effettuano un key-agreement, rispettivamente con  $(x,g^x),(y,g^y),(z,g^z)$. Allora:
 \begin{enumerate}
@@ -90,18 +89,17 @@ Poiché, tipicamente, $g\in{EC(\cdot)},g_t\in{Z_p^*}$, avremmo potuto anche calc
 \end{enumerate}
 \end{remark}
 \end{theorem}
-\end{solution}
-\begin{note}
+\begin{remark}
 E' \textbf{fondamentale} notare che avendo eseguito un pairing, il gruppo d'arrivo non è quello di partenza in cui vengono calcolate le chiavi pubbliche, quindi abbiamo potuto "barare" una e una sola volta con DH. Questo significa che non è possibile eseguire uno schema a 4-parti.
-\end{note}
+\end{remark}
 \end{problem}
 \section{Identity Based Encryption}
 \begin{problem}
 Vogliamo costruire un sistema crittografico a public-key dove la $pk$ è un \textbf{nome} (una stringa leggibile).
 \end{problem}
-\begin{note}
+\begin{remark}
 Proprio come con gli indirizzi IP, vogliamo cercare un metodo di associare ad un numero un nome che sia facilmente utilizzabile per una persona fisica.
-\end{note}
+\end{remark}
 Questa branca della crittografia viene definita Identity-Based Encryption (IBE). Nel 2001, Boneh propose una prima soluzione partendo dai risultati di Joux.\\
 Il ragionamento fatto da Boneh e che è alla base dello schema, consiste nel fatto che è possibile istituire un 3-way DH, dove il PKG ha $s,g^s$ e si occupa solo distribuire la chiave a B, mentre A ($r,g^r$) e B ($t,g^t$) calcolano, rispettivamente $e(g^s,g^t)^r=\hat{g}^{rst},e(g^s,g^r)^t=\hat{g}^{rst}$.\\
 Di base lo schema non potrebbe funzionare perché in realtà $B$ \textbf{non ha} inizialmente la \textbf{chiave privata} $t$, quindi \textbf{non può svolgere il suo calcolo}. Tuttavia, il PKG può fornire a $B$ direttamente il valore $g^{st}=(g^t)^s=("bob")^s$ piuttosto che $\hat{g}^{st}$ e permettere di "barare" calcolando il pairing tra due punti di EC, come se $t$ fosse il discrete-log di $h_1("bob")$ base $g$.
@@ -148,7 +146,7 @@ Ovviamente, i primi due problemi possono essere risolti creando un \textbf{siste
 
 %fare esercizio di implementare dist pkg with secret-sharing. Magari vedi Boneh-Franklin che dovrebbero averlo fatto nel paper.
 
-\begin{note}
+\begin{remark}
 IBE, così come è stato concepito, in realtà non è così fondamentale. La sua generalizzazione, l'Attribute-Based-Encryption, è uno schema molto potente che permette di creare sistemi nei quali invece di distribuire chiavi, gli utenti possono accedere a contenuti cifrati per il semplice fatto di appartenere ad una particolare categoria, ovvero, perché posseggono \textbf{gli attributi necessari} per accedervi.
-\end{note}
+\end{remark}
 % andrebbe completato con l'ultima parte della lezione 35, ma non c'è per l'esame.

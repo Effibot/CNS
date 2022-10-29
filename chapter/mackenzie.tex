@@ -4,9 +4,9 @@ Vorremmo creare uno schema che renda un device impossibile di essere usato senza
 \begin{definition}[Capture Resilient Device]\label{def:resdev}
 Dispositivo che può essere usato \textbf{solo e soltanto} dal proprietario.
 \end{definition}
-\begin{note}
+\begin{remark}
 Assumiamo che il \textbf{"core"} di questo dispositivo sia una secret-key.
-\end{note}
+\end{remark}
 Alcuni approcci possibili possono essere:
 \begin{itemize}
     \item password per bloccare/sbloccare (cifrare/decifrare) il dispositivo.
@@ -16,9 +16,9 @@ Alcuni approcci possibili possono essere:
 Sappiamo che una password è una soluzione \textbf{generalmente} debole per proteggere un segreto, una repository remota (o il suo gestore) deve essere affidabile o potrebbero esserci altri problemi e un hardware \textbf{\textit{realmente}} impossibile da manomettere \textbf{per sempre} non è detto esista. Sembra quindi che siano necessarie altri sistemi.
 \section{Capture-Protection Server}
 MacKenzie e Raiter nel 2003 risolsero il problema, creando uno schema \textit{a tre player} che coinvolgeva un \textbf{untrusted server} che poteva essere anche non fidato e due approcci possibili: standard cryptography o secret sharing.
-\begin{note}
+\begin{remark}
 L'idea è che se un attaccante dovesse riuscire a rubare il segreto di uno dei tre attori o una combinazione di 2 attori su 3, \textbf{non} è \textbf{possibile} dedurre niente e rompere il sistema.
-\end{note}
+\end{remark}
 \begin{remark}
 C'è una combinazione che può rompere il sistema: se un attaccante riuscisse a rubare sia la password che il device, allora sarebbe "digitalmente identico" al proprietario e non ci sarebbe niente da fare. \textbf{A meno di usare secret sharing}
 \end{remark}
@@ -68,9 +68,9 @@ Il protocollo si divide in due fasi:
     Solo un utente che ha il device e la password può decifrare la $SK_D$.
     \end{enumerate}
 \end{definition}
-\begin{note}
+\begin{remark}
 Un attaccante in possesso del device potrebbe vedere soltanto i valori di $v,a$ e il $tkt$. Tuttavia, dovrebbe riuscire a rompere l'envelope e dopo invertire l'hash o rompere $c$.
-\end{note}
+\end{remark}
 Le vulnerabilità aperte su questo schema sono due:
 \begin{itemize}
     \item \textbf{L'attaccante viene in possesso di $SK_D$:} in questo caso è possibile ad esempio disconnettere il device dalla rete e accedere a tutto.
@@ -107,7 +107,7 @@ Supponiamo di utilizzare uno schema di Secret-Sharing (2,2) con RSA come sistema
         \end{itemize}
         \item \textbf{Cancello} dal device tutto ciò che è in \textcolor{red}{rosso}.
     \end{enumerate}
-\end{corollary}\pagebreak
+\end{corollary}
 \begin{corollary}[Threshold SS for Capture-Protection: Key Retrieval]\label{def:retrboost}
 Sia $m$ il messaggio da firmare, \textbf{ogni volta} che avviene una transazione con il server.
 \begin{enumerate}
@@ -132,9 +132,9 @@ Sia $m$ il messaggio da firmare, \textbf{ogni volta} che avviene una transazione
     \end{align*}
     \end{enumerate}
 \end{corollary}
-\begin{note}
+\begin{remark}
 La \textbf{signature-key} $d$ \textbf{non è mai} trasmessa in chiaro. Pertanto, se un attaccante ottiene \textbf{sia} la password \textbf{che} il device, non può ottenere $d$ e firmare messagi come fosse il proprietario.
-\end{note}
+\end{remark}
 Con questo metodo, possiamo ampliare il protocollo con una funzione di disattivazione:
 \begin{corollary}[Threshold SS for Capture-Protection: Key Disabling]\label{def:keydis}
 Il server mantiene un database dove salva le associazioni $\{ticket,t\}$ che vengono black-listate. Se un utente \textbf{mantiene una copia off-line} di $t$, e il suo device viene rubato, può inviare al server in un qualsiasi momento un messaggio contenente la disabling-key e il server dopo aver autenticato l'utente inserirà il device nella black-list.

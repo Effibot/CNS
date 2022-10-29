@@ -9,36 +9,35 @@ I principali \textit{network security protocol} sono \textbf{SSH}, \textbf{SSL} 
     \item(\textbf{2008}) TLS v1.2 viene rilasciato per disaccoppiare i sistemi di sicurezza deboli come \textit{MD5/SHA-1} precedentemente hardcoded nel sistema. Introduce il concetto di \textit{Negotiated-PRF}, impostando come default \textit{SHA-256}.
     \item(\textbf{2018}) \textbf{TLS v1.3 viene rilasciato, costituendo un nuovo protocollo}. Vengono introdotti e ammessi solo cifratori basati su \textit{AEAD} e viene aggiunto il \textbf{\textit{Threeway-Handshake}}
 \end{itemize}
-\begin{note}
+\begin{remark}
 TLS v1.3 rimuove anche \textbf{RSA}, in quanto il modo in cui viene usato può portare a diversi problemi.
-\end{note}
+\end{remark}
 In ultimo è utile ricordare che:
 \begin{proposition}[Livelli di Protezione]
 SSL/TLS sono protocolli di protezione che vanno \textbf{sopra} lo strato di trasmissione e sotto quello applicativo. Tuttavia non vanno presi come un miglioramento alla sicurezza di TCP in quanto i servizi offerti da TLS non sono limitati al garantire un trasporto sicuro di dati e descrivono una più generale relazione point-to-point.\\
 Questo significa che SSL/TLS proteggono \textbf{esclusivamente}\footnotemark il payload di un determinato pacchetto.
 \footnotetext{\textsuperscript{\thefootnote}IPsec protegge invece tutto il pacchetto, sia payload che header.}
-\end{proposition}\pagebreak
+\end{proposition}
 \section{Il Supporto Applicativo}
-\begin{wrapfigure}{R}{0.5\textwidth}
-\vspace{-5mm}
-    \centering
-    \includegraphics[width=0.5\textwidth]{image/tlsencapsulation.png}
-    \caption{Port change made by TLS layer}
-    \label{fig:tlsencapsulation}
-\end{wrapfigure}
 Quando un servizio applicativo viene standardizzato bisogna specificare una serie di parametri come \textbf{IP address} e \textbf{port number} del servizio. TLS, avendo una \textit{struttura a strati}, riesce a fornire un supporto ben strutturato a questa modalità di sviluppo poiché l'applicazione utilizza nel suo pacchetto la porta del servizio applicativo da usare (es: HTTP) mentre lo strato TLS incapsula il valore di porta specificando il valore del servizio su cui c'è sicurezza.
 \begin{example}
 Supponiamo di inviare un pacchetto email tramite protocollo HTTP, che usa la porta 80. Poiché il servizio di mail offerto dal protocollo SMTP usa la porta 25, l'applicazione che utilizziamo per spedire il pacchetto specificherà nell'header la porta 80 e la porta 25. Se la connessione che usiamo è protetta da TLS, prima che il pacchetto venga passato allo strato di trasporto verranno specificate nuove porte, rispettivamente 443 per HTTPS e 587 per SMTPS, le due versioni sicure dei protocolli precedenti. 
 \end{example}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{image/tlsencapsulation.png}
+    \caption{Port change made by TLS layer}
+    \label{fig:tlsencapsulation}
+\end{figure}
 \begin{remark}
 Le ragioni dietro questa scelta sono prettamente storiche. All'inizio nessuno usava TLS al di fuori delle comunicazioni di rete e si voleva garantire la scelta di utilizzare un servizio piuttosto che un altro, comportando una duplicazione delle porte per una medesima applicazione.
 \end{remark}
-\begin{note}
+\begin{remark}
 IPsec usa un servizio chiamato \textbf{traffic flow confidentiality} che impedisce ad una persona intenta ad osservare il flusso dati in trasmissione quale protocollo/applicazione stiamo utilizzando. In TLS questo servizio \textbf{NON C'E'}, quindi l'applicazione e il protocollo appaiono in chiaro.
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 Analizziamo da ora in poi TLS v1.2, evidenziando alcune differenze con la v1.3.
-\end{note}
+\end{remark}
 \section{TLS Protocol Stack}
 Abbiamo detto che TLS nasce per garantire una connessione sicura. Vediamo quali sono i servizi che dobbiamo garantire per averla e il modo con cui vengono forniti. TLS deve:
 \begin{proposition}[TLS Services]
@@ -80,7 +79,7 @@ Il \textbf{\textit{Record Protocol}} si occupa di prendere il messaggio trasmess
 \begin{minipage}{0.4\textwidth}\vspace{4pt}
 %\begin{figure}[h]
 \centering
-\includegraphics[width=0.7\textwidth]{image/tlsrecord.png}
+\captionsetup{type=figure}\includegraphics[width=0.7\textwidth]{image/tlsrecord.png}
 %\caption{TLS Record Protocol}
 \captionof{figure}{TLS Record Protocol}
 \label{fig:tlsrecord}
@@ -94,7 +93,7 @@ Il \textbf{\textit{Record Protocol}} si occupa di prendere il messaggio trasmess
     \item Riassembla i frammenti.
     \item Trasmetti al livello applicativo il messaggio.
 \end{enumerate}
-\end{theorem}\pagebreak
+\end{theorem}
 Nel Record Protocol è possibile notare il primo grande errore delle versioni antecedenti\footnote{Nella v1.0/SSL v3 venne considerata l'ipotesi della compressione, ma non venne applicata.} alla 1.3. Il meccanismo di \textbf{compress-than-MAC and encrypt} infatti rendeva possibile un particolare attacco (molto complesso) di cui parleremo più avanti. Analizziamo ora i punti del protocollo:
 
 \begin{itemize}
@@ -118,13 +117,13 @@ La parte relativa ai dati trasmessi del Record Protocol (\cref{fig:tlsstack}) è
 Poiché TLS si appoggia, generalmente, a TCP non è necessario includere un SQN in quanto il protocollo di trasporto garantisce che i pacchetti arrivino in ordine.
 \end{remark}
 \end{definition}
-\begin{note}[\textbf{Replay Attack}]
+\begin{remark}[\textbf{Replay Attack}]
 Come detto nella \cref{prop:macreplay} un \textbf{MAC non protegge da replay attack} a meno che questo non venga calcolato on-the-fly includendo una nonce. Nel caso di TLS \textbf{venne usato} un \textbf{SQN}, \textbf{inizializzato a 0} e con \textbf{massimo $2^{64}-1$}, mantenuto in modo separato agli estremi della connessione.\\
 Poiché come detto TLS si appoggia a TCP, \textbf{per ottimizzare} il protocollo \textbf{non venne specificato} un sequence-number ma venne \textbf{usato} direttamente \textbf{quello} di \textbf{TCP} \textbf{per} eseguire \textbf{il calcolo del MAC} \textbf{senza} mai \textbf{includerlo nel pacchetto} trasmesso. 
-\end{note}
-\begin{note}[\textbf{Cambiamento in DTLS}]
+\end{remark}
+\begin{remark}[\textbf{Cambiamento in DTLS}]
 \textbf{\textcolor{red}{Per includere UDP come protocollo di trasmissione è stato necessario specificare un sequence di 8 bytes.}}
-\end{note}
+\end{remark}
 \begin{remark}
 Includere un sequence number come nonce permette di individuare dati extra o mancanti e di prevenire replay/reordering attack.
 \end{remark}
@@ -209,7 +208,7 @@ Vediamoli nel dettaglio:
     \item \textbf{Compression Length:} (1 byte) indica il numero di algoritmi di compressione disponibili.
     \item \textbf{Compression Algorithms:} (1 byte $\times$N) lista degli algoritmi di compressione disponibili.
 \end{itemize}
-\end{definition}\pagebreak
+\end{definition}
 \begin{definition}[Server Hello Message]\label{def:serverhello}
 \begin{itemize}
        \item \textbf{Handshake Type:} (1 byte) Indica che il messaggio è un client hello.
@@ -242,7 +241,7 @@ La fase 2 due scopi:
     \item \textbf{Inviare} la \textbf{chiave pubblica} del \textbf{server} al client tramite \textbf{certificato} o messaggio extra apposito.
 \end{itemize}
 \end{proposition}
-Vengono scambiati i seguenti messaggi:\pagebreak
+Vengono scambiati i seguenti messaggi:
 \begin{definition}[Phase 2 Messages]\label{def:hand2}
 \begin{enumerate}  \setcounter{enumi}{2}
     \item \textbf{Certificate:} (opzionale) inviato dal Server se richiesto dal client. Contiene il \textbf{certificato} o la \textbf{catena di certificati} del server.
@@ -279,13 +278,13 @@ Vengono quindi scambiati i seguenti messaggi:
     Verificato tramite \textbf{certificate transparency} (\cref{fig:certrans}).
 \end{enumerate}
 \end{definition}
-\begin{note}
+\begin{remark}
 Il messaggio di \textbf{Certificate Verity} è inviato come nono messaggio per includere nella \textbf{firma digitale} tutti i \textbf{parametri crittografici scambiati} durante l'\textbf{handshake}, così che vengano protetti:
 \begin{itemize}
     \item Tutti i \textbf{valori casuali} generati dal client e dal server.
     \item Il \textbf{Master Secret} comune, calcolato da client e server, che può essere \textbf{computato} solamente \textbf{dopo} che l'handshake protocol è arrivato a trasmettere il messaggio di \textbf{client Key Exchange}.
 \end{itemize}
-\end{note}
+\end{remark}
 \subsection{Fase 4: Finish Message}
 La fase 4, infine, deve:
 \begin{proposition}[Phase 4]\label{prop:phase4}
@@ -318,15 +317,15 @@ Con i messaggi di handshake di questa fase viene anche autenticato il server.
 \end{remark}
 \begin{remark}
 Per avere una \textbf{negoziazione affidabile} devono \textbf{sempre} essere \textbf{utilizzati} i meccanismi di \textbf{firma e message authentication}, così da \textbf{evitare tampering attacks}. I meccanismi di criptazione simmetrica invece possono essere disattivati nel caso in cui il client ed il server non sono interessati alla confidenzialità.
-\end{remark}\pagebreak
+\end{remark}
 \subsection{Handhshake Abbreviato}
 L'hanshake abbreviato permette di \textbf{riavviare} la sessione su una nuova connessione. Permette inoltre di \textbf{rigenerare} le \textbf{chiavi di sessione} senza dover riautenticare le parti e/o riscambiare il pre-master secret. E' a tre vie e composto dai messaggi in \cref{fig:handshakeabbr}
-\begin{note}
+\begin{remark}
 Nella parte equivalente alla fase 4 (\cref{prop:phase4}) dell'handshake completo l'ordine di invio tra client e server è invertito, così da ottenere un handshake a 3 vie.
-\end{note}
-\begin{figure}[h]
+\end{remark}
+\begin{figure}[H]
     \centering
-    \includegraphics{image/handshakeabbr.png}
+    \includegraphics[width=\linewidth]{image/handshakeabbr.png}
     \caption{Handshake Abbreviato}
     \label{fig:handshakeabbr}
 \end{figure}
@@ -389,27 +388,27 @@ La strategia EtE consta di due fasi:
     Serve ad \textbf{estendere} un\textbf{ segreto limitato} alla quantità di materiale crittografico desiderata, ovvero al numero di chiavi di sessione necessarie.
     \end{remark}
 \end{enumerate}
-\end{definition}\pagebreak
+\end{definition}
 La funzione PRF usata in \textit{\textbf{EtE}} può essere costruita utilizzando la costruzione HMAC (\cref{eq:hmac}) con una funzione \textbf{crypto hash} qualsiasi. Alcuni dei modi usati sono i seguenti:
 \begin{itemize}
     \item Funzione di \textbf{Espansione Hash}:
     \[P_H(secret, label,seed)=HMAC_{H,secret}(A_1||A_0)||HMAC_{H,secret}(A_2||A_0)||\dots
     \]
     Dove $A_i=HMAC_{H,secret}(A_{i-1})$ e $A_0=ctx\_str||seed$. 
-    \begin{note}
+    \begin{remark}
     Questa costruzione \textbf{non è sicura} in quanto non fornisce garanzie sull'assenza di collisioni sul risultato prodotto. Ad esempio potremmo andare in contro a \textbf{short cycle problem} (\cref{def:shortcycle})
-    \end{note}
+    \end{remark}
     \item \textbf{HMAC-Based Key Derivation Function}:
     \begin{definition}[HKDF]\label{def:hkdf}
     Costruzione sicura in quanto utilizza un contatore per evitare cicli.
     \[\text{HKDF}(secret,label,seed)=\text{HMAC}_{H,secret}(ctx\_str||0)||\text{HMAC}_{H,secret}(\cdot||1)||\dots\]
     \end{definition}
 \end{itemize}
-\begin{note}
+\begin{remark}
 Con ctx\_str indichiamo una \textbf{context string}, ovvero una stringa formata da un testo arbitrario aggiuntivo e un seed.
 Il suo contenuto è \textbf{esplicativo} del contesto nel quale stiamo calcolando la chiave e indica lo scopo della computazione, ad esempio:
 \[PRF(master-secret, \textcolor{teal}{\text{\textbf{"client finished"}}}, \text{MD5}(\text{all handshake msg})|\text{SHA1}(\text{all handshake msg}))\]
-\end{note}
+\end{remark}
 Con questi metodi si possono ottenere digest di lunghezza arbitraria e costruire le chiavi necessarie a TLS per operare correttamente ed utilizzare una chiave diversa per ogni servizio. Ogni versione del protocollo utilizza una propria PRF:
 \begin{itemize}
     \item \textbf{SSL V3.0}: utilizza una PRF che non soddisfa le proprietà richieste.
@@ -426,7 +425,7 @@ Con questi metodi si possono ottenere digest di lunghezza arbitraria e costruire
     \caption{KDF Scheme}
     \label{fig:kdf}
 \end{figure}
-\pagebreak
+
 \section{Other Minor Protocols}
 Ci sono ulteriori protocolli minori necessari al funzionamento e alla gestione della sessione, come la gestione degli errori o cambio di stato della sessione.
 \subsection{Change Chiper Spec Protocol}
@@ -444,7 +443,7 @@ Con tale soluzione i \textbf{\textit{finished message}} dell'handshake, poiché 
     \includegraphics{image/changecipher.png}
     \caption{Change Cipher Spec Protocol Message}
     \label{fig:changecipher}
-\end{figure}\pagebreak
+\end{figure}
 \subsection{Alert Protocol}
 \begin{definition}[Alert Protocol]\label{def:alertprot}
 E' un protocollo che permette lo scambio  di \textbf{avvertimenti} tra client e server, al fine di segnalare avventimenti eccezionali e/o errori. A tale scopo vengono definiti messaggi speciali per comunicare e gestire tali casi.
@@ -477,9 +476,9 @@ Questi messaggi sono \textbf{incapsulati} come \textbf{payload all’interno di 
     \caption{Alert Protocol Message}
     \label{fig:tlsalert}
 \end{figure}
-\begin{note}
+\begin{remark}
 Il warning di \textbf{close\_notify} viene utilizzato dal protocollo TLS per terminare la connessione in modo volontario da una delle due parti. Da questo momento in poi, una delle due parti specifica che \textbf{non} verranno più trasmessi ulteriori dati applicativi.
-\end{note}
+\end{remark}
 Questo meccanismo permette di \textbf{distinguere} tra le \textbf{connessioni terminate volontariamente in modo sicuro}  e quelle \textbf{interrotte da cause esterne}, tra cui la \textbf{terminazione della} sottostante \textbf{connessione TCP}.
 \subsection{Renegotiation}
 La rinegoziazione è la possibilità di effettuare un handshake completo per una connessione TLS già esistente così da poter cambiare i parametri di sicurezza, come ad esempio il cipher suite utilizzato o autenticare una parte precedentemente non autenticata. Alcuni dettagli importanti sono:
@@ -496,10 +495,10 @@ Ne deriva che:
     \item La \textbf{rinegoziazione non è distinguibile} dalle \textbf{negoziazione precedenti}, escluso il fatto che è criptato usando la precedente cipher suite. Inoltre, non sono legate crittograficamente tra loro.
     \item Una \textbf{transazione} effettuata a \textbf{livello applicativo} potrebbe essere \textbf{spezzata} in due parti dall'esecuzione di una rinegoziazione, comportando differenza nella sicurezza applicata alle due parti.
 \end{itemize}
-\begin{note}
+\begin{remark}
 L'interruzione del livello applicativo genera delle vulnerabilità in TLS che \textbf{non} possono essere rilevate da cliene server.
-\end{note}
-\pagebreak
+\end{remark}
+
 \section{DTLS}
 Il protocollo DTLS è una versione del \textbf{protocollo TLS che viene trasportata tramite il protocollo UDP}. Le principali differenze con la versione tradizionale trasportata tramite il protocollo TCP sono:
 \begin{definition}[DTLS Major Features]\label{def:dtls}
@@ -526,9 +525,9 @@ Allo stesso tempo, sappiamo che l'\textbf{encryption POTREBBE non garantire inte
     \item \textbf{IPsec:} Encrypt-then-MAC. Invio $ENC(Data)|MAC(ENC(Data))$. L'unico modo giusto, ma \textit{AEAD} (\cref{chap:aead}) è meglio.
     \item \textbf{SSH:} Encrypt-then-MAC. Invio $ENC(Data)|MAC(Data)$. Nonostante possa essere visto come più efficiente in quanto encryption e integrity possono essere svolte in parallelo, è formalmente sbagliato in quanto il MAC da solo non protegge la confidentiality, ed essendo deterministico (il mac per uno stesso messaggio deve essere lo stesso per definizione) risulta facilmente attaccabile appena c'è un messaggio ripetuto.
 \end{itemize}
-\begin{note}
+\begin{remark}
 Per le operazioni di decrittazione, è importante la dimensione dei pacchetti e, di riflesso, il padding usato. TSL specifica come definire il padding:
-\end{note}
+\end{remark}
 \begin{definition}[TLS Padding]
 Assumiamo che $L$ sia la dimensione di un blocco cifrato e che l'ultimo byte del blocco contenga proprio il valore di $L$. Se $L$ è la dimensione del blocco meno 1, allora viene inserito un byte di padding il cui valore è $00$. Se la dimensione è inferiore a quella di un blocco, allora come padding vengono inseriti tanti byte il cui valore è quello di $L$.\\
 Se $L$ è pari alla dimensione del bloco e non sarebbe necessario padding, si crea un nuovo blocco composto da solo byte di padding.
@@ -549,7 +548,7 @@ Consideriamo TLS v1.0 e il meccanismo di decrittazione usato da CBC (\cref{def:c
 \end{enumerate}
 \begin{remark}
 Il comportamento di error-signaling è tipico dei protocolli di rete, dove la \textbf{ragione dell'errore} viene sempre spiegata. 
-\end{remark}\pagebreak
+\end{remark}
 \begin{definition}[Padding Oracle Attack\footnotemark]\label{def:padoracle}
 \footnotetext{\textsuperscript{\thefootnote}Modello di attacco valido \textbf{per ogni} block-cipher.}
 Consideriamo un sistema che accetta messaggi cifrati e che usi un block-cipher per cifrare e decifrare i messaggi.\\
@@ -562,9 +561,9 @@ Supponiamo che l'attaccante \textbf{disponga di un ciphertext} $C$ (ad esempio i
 Sapendo il modo con cui questo decrypta il messaggio e restituisce il codice d'errore l'attaccante ha a disposizione un \textbf{oracle} che, dato un messaggio cifrato in ingresso, è in grado di fornire informazioni sul plaintext.
 \footnotetext{\textsuperscript{\thefootnote}Anche se i ciphertext sono corretti con \textbf{probabilità} \textbf{"negligible"}, l'errore può essere controllato a prescindere.}
 \end{definition}
-\begin{note}
+\begin{remark}
 Non è necessario che il sistema risponda con un codice esplicito di errore. Spesso differenze nel tempo di elaborazione e nel comportamento che assume il sistema possono essere un indicatore per un attaccante in grado di intercettare questi dettagli.
-\end{note}
+\end{remark}
 \begin{example}[ Padding Oracle in TLS v1.0]\label{exam:padoracle}\hfill\\
 Consideriamo lo scenario di TLS e, per semplicità, supponiamo che stia usando CBC (\cref{fig:cbcdec}) e che l'attaccante disponga di un ciphertext formato da $c[0],c[1]$ e del relativo $IV$.\\ 
 Per come funziona CBC in decryption abbiamo che:
@@ -584,45 +583,44 @@ Inviando questo messaggio all'oracolo riceveremo, nella maggior parte dei casi, 
     \item \textbf{Bad-MAC}: allora il messaggio decifrato sarà $m[1] = xx\,xx\,xx\,xx\,|0\times00$. Tale messaggio produrrà un MAC diverso ma a noi non importa perché abbiamo scoperto il padding che era stato fatto su $m[1]$ e il valore del suo ultimo byte, ovvero: $m[1]=xx\,xx\,xx\,xx\,v$.
 \end{enumerate}
 Dal caso due capiamo che l'attaccante è ora a conoscenza dell'ultimo carattere di $m[1]$ e ora può iterare facendo brute-force su tutti i byte rimanenti, aumentando di 1 il valore del padding così da non alterare la dimensione del blocco che verrà controllato. In questo modo il sistema attaccato, controllando l'ultimo byte contenente la lunghezza del messaggio, arriverà sempre al terzo check. 
-\begin{note}\textbf{[Complessità dell'Attacco]}
+\begin{remark}[Complessità dell'Attacco]
 La complessità dell'attacco è $\leq{L}$, dove $L$ è la lunghezza del blocco da decifrare. Con 8 un blocco da byte avremmo al più $(2^8)*8$ per decriptare un solo block.
-\end{note}
-\begin{figure}[h]
+\end{remark}
+\begin{remark}[Ricorsione per determinare il Padding]
+E' possibile determinare il padding fatto sul blocco da decifrare partendo dal modificare uno alla volta i primi $k$-byte dell'IV relativo finché non otteniamo un \textbf{DECRYPTION\_FAILED}. Allora il padding fatto sarà $n-k$ e possiamo provare l'attacco.
+\end{remark}
+\end{example}
+\begin{figure}[ht]
     \centering
-    \includegraphics{image/padoracle.png}
+    \includegraphics[width=\linewidth]{image/padoracle.png}
     \caption{Padding Oracle}
     \label{fig:padoracle}
 \end{figure}
-\begin{note}\textbf{[Ricorsione per determinare il Padding]}
-E' possibile determinare il padding fatto sul blocco da decifrare partendo dal modificare uno alla volta i primi $k$-byte dell'IV relativo finché non otteniamo un \textbf{DECRYPTION\_FAILED}. Allora il padding fatto sarà $n-k$ e possiamo provare l'attacco.
-\end{note}
-\end{example}
-\subsection{Solutions of next versions and Final Considerations}
-Dall'esempio \ref{exam:padoracle} capiamo che MAC-than-Encrypt \textbf{NON E' MAI LA SCELTA MIGLIORE}, in quanto per proteggersi da un padding oracle sarebbe bastato autenticare il testo cifrato, così da bloccare ogni possibile modifica ad esso.\\
+\subsection{Solutions of next versions and Final Considerations}Dall'esempio \ref{exam:padoracle} capiamo che MAC-than-Encrypt \textbf{NON E' MAI LA SCELTA MIGLIORE}, in quanto per proteggersi da un padding oracle sarebbe bastato autenticare il testo cifrato, così da bloccare ogni possibile modifica ad esso.\\
 TLS 1.0 infatti venne patchato, selezionando come ritorno in caso di errore sempre e solo \textbf{BAD\_MAC}, soluzione poi standardizzata da TLS 1.1 e cambiata in \textbf{TLS v1.2}, dove se il \textbf{padding falliva}, il \textbf{MAC} era \textbf{validato in OGNI caso}.
 Questo perché fino alla v1.1 tramite side-channels era comunque possibile capire grazie al tempo di risposta del server in quale fase ci fosse stato il fallimento in quanto più tempo di risposta implica che l'errore è avvenuto in una fase successiva.\\
 \begin{corollary}[Problem with TLS v1.2 workaround]
 Validando il MAC in ogni caso, sorge il problema di \textbf{non sapere più quale dato viene validato}, poiché se il padding-check fallisce non abbiamo modo di conoscere la dimensione del messaggio rispetto a quella del padding. TLS v1.2 usava l'\textbf{intero messaggio} per convalidare, ma questo implicava l'uso di più dati e più tempo per calcolare l'HMAC.
 \end{corollary}
-\begin{note}
+\begin{remark}
 L'unico modo per patchare definitivamente TLS fu quello di rimuovere ogni forma di combinazione di ENC e MAC e di usare AEAD.
-\end{note}
-\begin{proposition}[Praticità dell'Attacco]\hfill\\
+\end{remark}
+\begin{proposition}[Praticità dell'Attacco]
 Un padding oracle potrebbe non essere applicabile in ogni scenario della realtà, in quanto TLS appena rileva un errore chiude la connessione e bisogna ricominciare daccapo. Tuttavia, resta uno strumento molto forte nelle mani di un hacker.
 \end{proposition}
 Nel 2003 è stato dimostrato che l'attacco è realizzabile su protocollo IMAP, in quanto i client IMAP fanno periodicamente login ogni 5 minuti, trasmettendo le credenziali che vengono inviate \textbf{sempre con lo stesso format}. Facendo un DNS spoofing (MITM) è stato possibile effettuare un CCA, ottimizzando con strategie dictionary attack per scoprire le password.
 \section{Major Vulnerabilities}
 Una delle più grandi falle in TLS 1.0 fu la \textbf{scelta} di implementare hardcoded gli algoritmi di cifratura, compromettendone la resistenza \textit{a lungo termine}.\\
-Uno degli algoritmi implementati era CBC, il quale soffre di un problema di \textit{IV-prediction}, Infatti per operare la cifratura di una serie di messaggi, soltanto il primo IV del primo gruppo di blocchi veniva generato "on-the-fly", perché per gli altri gruppi veniva usato l'ultimo cipherblock del gruppo precedente.\\
+Uno degli algoritmi implementati era CBC, il quale soffre di un problema di \textit{IV-prediction}, Infatti per operare la cifratura di una serie di messaggi, soltanto il primo IV del primo gruppo di blocchi veniva generato "on-the-fly", perché per gli altri gruppi veniva usato l'ultimo cipherblock del gruppo precedente.
 \begin{remark}
 Se l'IV dipende dal blocco precedente, nonostante abbiamo la sicurezza semantica (IND-CPA), un attaccante può predire l'IV del prossimo processo di encryption e arrivare al plaintext.
 \end{remark}
 \begin{figure}[ht]
     \centering
-    \includegraphics{image/ivpred.png}
+    \includegraphics[width=\linewidth]{image/ivpred.png}
     \caption{Last ciphertext-block of M1 used as IV for M2}
     \label{fig:ivpred}
-\end{figure}\pagebreak
+\end{figure}
 Lo schema di attacco per un IV prevedibile è allora il seguente:
 \begin{definition}[IV Prediction Attack]\label{def:ivpredatk}
 Supponiamo di sapere che l'i-esima porzione di m, $m[i]$, contenga una password e supponiamo per semplicità che la password possa essere $A$ o $B$. Consideriamo lo schema di encryption di CBC (\cref{def:cbcenc}). Poiché \textbf{CBC è semantic secure}, non è possibile usare un CPA, ma è possibile osservare $c[i-1]$.\\
@@ -631,13 +629,13 @@ Sia $X$ l'IV predetto, allora, forgiamo un ciphertext tale che:
 Se l'IV è stato predetto correttamente, allora basterà chiedere al sistema di cifrare per noi $m[i]$ con IV pari a  $c^{'}[i-1]$. \\
 Se $c^{'}[i-1]=c[i]$, allora abbiamo individuato la password. Altrimenti dobbiamo provare l'altra password.
 \end{definition}
-\begin{note}
+\begin{remark}
 Inizialmente si pensava che l'attacco fosse impossibile da realizzare davvero, ma la vulnerabilità venne exploitata davvero tramite le moderne tecnologie, come HTML5. Ad esempio, tramite l'inserimento forzato di chosen plaintext facendo girare codice direttamente sul browser dell'utente.
-\end{note}
+\end{remark}
 \subsection{BEAST Attack: Chosen Boundary Attack}
 Consideriamo i cookie di un servizio on-line. Questi oggetti contengono in locale delle informazioni utili alle web-app per \textit{velocizzare} l'utilizzo delle stesse, al fine di portare un vantaggio all'utente. Ad esempio sono utili per effettuare un \textit{"login veloce"}, in quanto il browser può auto-completare i campi e-mail e password di un form.\\
 Tuttavia, è stato provato che è possibile decifrare i cookie di un browser e la complessità è lineare con la loro lunghezza. Questo lavoro è stato provato da Duong e Rizzo, nell'attacco BEAST\footnote{\href{https://bug665814.bmoattachments.org/attachment.cgi?id=540839}{BEAST}}.
-\pagebreak
+
 \begin{definition}[Chosen Boundary Attack]\label{def:beastatk}
 Supponiamo che un cookie contenga nell'ultimo blocco la password di un utente, supponiamo di sapere il punto in cui la password comincia, per semplicità\footnotemark. Abbiamo allora a disposizione: $IV=c[i-1]$, $c[i]=Enc_k(c[i-1]\oplus{P[i]})$ e vogliamo indovinare $P[i]$.
 \begin{enumerate}
@@ -660,18 +658,18 @@ Supponiamo che un cookie contenga nell'ultimo blocco la password di un utente, s
 \end{definition}
 \begin{figure}[h]
     \centering
-    \includegraphics{image/beast.png}
+    \includegraphics[width=\linewidth]{image/beast.png}
     \caption{BEAST Attack}
     \label{fig:beast}
 \end{figure}
 \subsection{CRIME Attack: Compression after Encryption leakeage}
 Nel 2012, Duong e Rizzo dimostrarono che la compressione messa in atto da TLS portava ad un leak di informazioni riguardo il plaintext. Saltò fuori che in realtà il problema è intrinseco a qualsiasi sistema di compressione. Infatti:
 \begin{example}[ Compression Size Leak]
-Consideriamo una password di 6 byte: $AAAABC$. Applichiamo \textbf{Compress-than-Encrypt}, producendo prima $4ABC$ e poi $X\&\%\$$.\\
+Consideriamo una password di 6 byte: $AAAABC$. Applichiamo \textbf{Compress-than-Encrypt}, producendo prima $4ABC$ e poi $X\&\%\$$.
 \begin{remark}
 La lunghezza della password è passata da 6 a 4B.
 \end{remark}
-Consideriamo un altra password da 6 byte, la cui entropia è maggiore: $ABCDEF$. Poiché l'entropia è massima, la compressione produrrà: $ABCDEF$ e l'encryption $\&\$\text{£A£}\$$.\\
+Consideriamo un'altra password da 6 byte, la cui entropia è maggiore: $ABCDEF$. Poiché l'entropia è massima, la compressione produrrà: $ABCDEF$ e l'encryption $\&\$\text{£A£}\$$.
 \begin{remark}
 La lunghezza della password è rimasta a 6B.
 \end{remark}
@@ -691,9 +689,9 @@ Supponiamo di voler indovinare la password di un utente e \textbf{supponiamo di 
 Se la lunghezza è stata ridotta, significa che la nostra aggiunta era \textbf{UGUALE} (almeno) alla prima lettera della password. 
 \footnotetext{\textsuperscript{\thefootnote}set di $n$ lettere tutte uguali: $AAA$}
 \end{definition}
-\begin{note}
+\begin{remark}
 Non potremmo comunque sapere tutta la password in questo modo, soltanto la prima o le prime lettere, se dovessere essere uguali. 
-\end{note}
+\end{remark}
 Lo schema descritto venne adottato nell'attacco \textbf{CRIME}\footnote{Compression Ratio Info-Leak Made Easy}, sempre ad opera di Duong e Rizzo nel 2012. Riutilizzando gli stessi tool di BEAST, riuscirono a fare plain-text injection per sfruttare una vulnerabilità di \textit{\textbf{DEFLATE}}, un algoritmo di compressione basato sulla codifica \textit{\textbf{Huffman}}\footnote{\href{https://it.wikipedia.org/wiki/Codifica_di_Huffman}{Huffman Encoding}} e su \textbf{\textit{LZ77}}, una politica di compressione che \textbf{sostituisce 3 o più caratteri ripetuti} in una stringa con una \textbf{coppia $(\text{Offset}, \text{Size})$} che costituisce un puntatore ad un punto precedente della stringa.
 \begin{example}[ LZ77]Consideriamo la seguente stringa:
 \textit{Giuseppe \textcolor{orange}{Bianchi} and Marco \textcolor{orange}{Bianchi}ni}\\
@@ -715,10 +713,10 @@ Supponiamo di conoscere un testo generato da un utente, composto da una parte \t
     \caption{CRIME example for auth token in HTTP session}
     \label{fig:crime}
 \end{figure}
-\begin{note}
+\begin{remark}
 In realtà  ci sono altri dettagli tecnici che andrebbero sviscerati, ma che non sono stati trattati, come il fatto che la compressione lavora sui singoli bit e non su byte, oppure che abbiamo completamente trascurato la codifica usata.\\
 E' interessante osservare anche che l'attacco venne fatto su due protocolli diversi, TLS e SPDY (considerato HTTP2.0) e che il meccanismo è agnostico al sistema di cifratura.
-\end{note}
+\end{remark}
 \subsection{Downgrade Attack}
 Il downgrade attack si basa su potenziali vulnerabilità \textbf{nella fase 1} dell'handshake protocol. Si tratta di un MITM con l'obiettivo di modificare la versione in uso di TLS tra client e server, affinché sia possibile sfruttare ulteriori falle.\\
 Idealmente l'attacco è possibile in quanto per retrocompatibilità, stabilità ed affidabilità, diverse sistemi non vengono aggiornati a versioni recenti dei protocolli perché troppo costoso in termini di risorse (temporali ed economiche). Vediamone le caratteristiche:
@@ -744,10 +742,10 @@ Durante la fase 2 e 3 un downgrade attack viene intercettanto in quanto:
     L'attaccante non può neanche decriptare la pre-master secret inclusa nel messaggio, per cui non può inferire nulla sulle future chiavi di sessione.
     \end{remark}
 \end{itemize}
-\end{proposition}\pagebreak
-\begin{note}
+\end{proposition}
+\begin{remark}
 Si noti che il \textbf{Certificate message non} è \textbf{obbligatorio} e che il \textbf{Client Key Exchange} potrebbe essere ut\textbf{ilizzato solamente} per inviare la \textbf{pre-master secret al server}, ovvero \textbf{non includere la versione TLS} dichiarata dal client, rendendo di fatto il Downgrade attack realizzabile su alcune istanze TLS.
-\end{note}
+\end{remark}
 \subsection{Truncation Attack}
 Il \textbf{truncation attack} si basa sulla vulnerabilità a \textbf{DoS Attacks}\footnote{Denial of Service} del sottostante protocollo TCP che si occupa di trasportare il \textbf{protocollo TLS}. In particolare, l'attacco è caratterizzato nel seguente modo:
 \begin{itemize}
@@ -759,15 +757,15 @@ Due possibili correzioni per proteggere delle applicazioni non consapevoli dei \
 \begin{theorem}[TCP over TLS over TCP]
 la \textbf{connessione TCP utilizzata dall'applicazione} viene \textbf{trasportata} all'interno del protocollo \textbf{TLS}, a sua volta \textbf{trasportato} da una \textbf{seconda istanza TCP}. L'attacco risulta perciò trasparente all'applicazione, in quanto viene interrotta la seconda istanza TCP ma non quella utilizzata dall'applicazione stessa.
 \end{theorem}
-\begin{note}
+\begin{remark}
 L’uso di una doppia connessione TCP degradare le prestazioni della connessione complessiva in quanto gli algoritmi di congestion control delle diverse istanze del protocollo possono andare in conflitto tra loro. Inoltre, se la soluzione prevede anche differenti connessioni TCP tra i nodi intermedi della comunicazione, tale problematica viene amplificata.
-\end{note}
+\end{remark}
 \begin{theorem}[TCP over DTLS over UDP]
 la \textbf{connessione TCP utilizzata dall'applicazione} viene \textbf{trasportata} all'interno del protocollo \textbf{DTLS}, a sua volta \textbf{trasportato} da una \textbf{seconda istanza UDP}. L'attacco viene vanificato dall'assenza di una connessione reale in quanto il trasportatore finale è il protocollo UDP.
 \end{theorem}
-\begin{note}
+\begin{remark}
 L’uso del protocollo UDP rende inaffidabile la consegna dei segmenti UDP, sebbene permetta di evitare conflitti tra le varie istanze del protocollo e migliorare quindi le performance.
-\end{note}
+\end{remark}
 \begin{remark}
 Il \textbf{protocollo TLS attenua gli effetti che il Truncation attack} può generare \textbf{utilizzando} i \textbf{warning} alert di \textbf{Close Notify}, così che le parti possano \textbf{distinguere} tra \textbf{connessioni TLS terminate legittimamente} e \textbf{connessioni TLS terminate per cause esterne}. Resta comunque debole a tale attacco.
 \end{remark}
@@ -799,9 +797,9 @@ Il renegotiation attack è stato corretto in TLS v1.2 con la \textbf{TLS Renegot
     \item Nella \textbf{prima negoziazione:} il campo contiene un byte pari a 0 per indicare che è il \textbf{primo handshake completo} per la corrente sessione TLS.
     \item Nelle \textbf{rinegoziazioni:} contiene l'ultimo \textbf{finished message} del \textbf{precedente handshake}, così da indicare implicitamente l'\textbf{avvenimento di una rinegoziazione} e \textbf{legare crittograficamente} tra loro le \textbf{rinegoziazioni successive}. Ciò permette di \textbf{rilevare} l'avvenimento di un attacco.
 \end{enumerate}
-\begin{note}
+\begin{remark}
 La rinegoziazione è stata \textbf{disabilitata} in TLS v1.3 poiché considerata troppo vulnerabile.
-\end{note}
+\end{remark}
 \section{TLS v1.3}
 La versione più recente e sicura del protocollo TLS presenta delle differenze sostanziali, tant'è che potremmo definirla una 2.0. Le principali sono:
 \begin{theorem}[TLS v1.3 "Changelog"]\label{thm:tls13}
@@ -855,7 +853,7 @@ La PFS offre quindi protezione verso un attaccante in grado di:
 \begin{theorem}[PMS obtained by EDH]
 La PMS è garantita dall'uso di EDH (\cref{def:ephdh}).
 \end{theorem}
- Infatti, nel caso in cui le chiavi segrete $SK_C, SK_S$ vengono scoperte l’attaccante non ottiene informazioni utili a calcolare il pre-master secret, al quale vengono derivate le chiavi di sessione necessarie alla decriptazione.\\
+ Infatti, nel caso in cui le chiavi segrete $SK_C, SK_S$ vengono scoperte l’attaccante non ottiene informazioni utili a calcolare il pre-master secret, al quale vengono derivate le chiavi di sessione necessarie alla decriptazione.
 \begin{remark}
 Se l'attaccante è passivo, non può ottenere le chiavi di sessioni, né passate né future.
 \end{remark}
@@ -873,19 +871,19 @@ In Entrambi i casi, dato che le nonces sono inviate in chiaro e le funzioni PRF 
     \includegraphics[width=0.7\textwidth]{image/ephdh.png}
     \caption{Ephimeral Diffie Hellman in TLS v.1.3 during Key Exchange}
     \label{fig:ephdh}
-\end{figure}\pagebreak
+\end{figure}
 \subsection{Handshake}
 L'handshake completo in v1.3 è composto dai seguenti messaggi:
 \begin{figure}[h]
     \centering
-    \includegraphics{image/handshakev13.png}
+    \includegraphics[width=\linewidth]{image/handshakev13.png}
     \caption{TLS v1.3 Handshake Protocol}
     \label{fig:tlshand13}
-\end{figure}\\
+\end{figure}
 \begin{remark}
 Come possiamo vedere, avendo \textbf{obbligato} l'uso di \textbf{EDH} per il key agreement, l'\textbf{handshake} ne risulta più \textbf{snello e veloce} in quanto il \textbf{client} \textbf{non deve più aspettare la chiave pubblica del server}, ottenuta tramite il relativo certificato.\\
 Inoltre, ci viene garantita la PMS e possiamo criptare immediatamente i certificati, per garantire \textit{\textbf{identity protection}}
-\end{remark}\pagebreak
+\end{remark}
 \subsection{Perfect Forward Secrecy con Pre-Shared Key}
 TLS v1.3 permette di garantire PFS anche con uso esclusivo \textbf{pre-shared key}, ovvero, permette di \textbf{derivare chiavi di sessione} in maniera \textbf{sicura} e \textbf{senza usare} certificati e firme digitali.
 \begin{theorem}[PMS with Pre-Shared Key]
@@ -894,16 +892,16 @@ Le \textbf{chiavi di sessione} vengono calcolate usando le \textbf{nonces} e \te
 \[\text{Keys}=\text{HKDF}(PSK,label,\{nonce_C,nonce_S,g^{xy}\mod(P)\})\]
 \footnotetext{\textsuperscript{\thefootnote}Può essere installata offline o determinata alla prima connessione TLS tra le due parti.}
 \end{theorem}
-\begin{note}
+\begin{remark}
 Nel caso in cui venga scoperta la PSK, un attaccante \textbf{non è in grado} di recuperare le chiavi di sessioni passate in quanto i valori segreti $X,Y$ cambiano ad ogni \textbf{rekeying} e \textbf{non è computazionalmente} in grado di \textbf{calcolarli} a partire dalla \textbf{conoscenza} di $g^{xy}\mod(P)$
-\end{note}
-\begin{note}
+\end{remark}
+\begin{remark}
 La PSK ha caratteristiche \textbf{simili} al \textbf{PMS}, ma:
 \begin{itemize}
     \item Viene utilizzato differentemente nella generazione delle chiavi.
     \item Non viene rigenerato ad ogni nuova sessione TLS.
 \end{itemize}
-\end{note}
+\end{remark}
 \subsection{0-RTT Data}
 Una caratteristica di TLSv1.3 è la \textbf{possibilità} di effettuare \textbf{0-RTT Data}:
 \begin{definition}[0-RTT Data]\label{def:zerortt}

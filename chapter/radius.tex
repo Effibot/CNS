@@ -23,7 +23,7 @@ Protocollo di tipo \textbf{AAA UDP-based}\footnotemark, che fornisce:
     \includegraphics[width=0.8\textwidth]{image/radius.png}
     \caption{Main RADIUS components}
     \label{fig:radiusscheme}
-\end{figure}\pagebreak
+\end{figure}
 Le principali componenti del protocollo sono le seguenti:
 \begin{definition}[RADIUS Entities]
 \begin{itemize}
@@ -50,12 +50,12 @@ Il processo di autenticazione avviene (nei minimi dettagli) nel seguente modo:
 Il protocollo RADIUS supporta connessioni remote, anche quando non possiamo connetterci direttamente alla rete desiderata. Difatti i RADIUS server svolgono la funzione di \textbf{Proxy Server} per altri RADIUS server \textbf{remoti}.
 \begin{theorem}[Servizio di Proxy]
  Eseguono i servizi per conto di altri RADIUS server (es. facendo \textit{roaming} tra diversi ISP). Le funzionalità di proxy possono essere svolte sia in maniera trasparente che non, specificandolo nel contenuto del messaggio.
-\end{theorem}\pagebreak
+\end{theorem}
 \section{Pacchetti RADIUS}
 Come ogni protocollo, RADIUS impone una precisa specifica per il formato dei suoi messaggi:
 \begin{figure}[h]
     \centering
-    \includegraphics{image/radpack.png}
+    \includegraphics[width=\linewidth]{image/radpack.png}
     \caption{RADIUS Packet Structure}
     \label{fig:radpack}
 \end{figure}
@@ -87,9 +87,9 @@ Come ogni protocollo, RADIUS impone una precisa specifica per il formato dei suo
         \item \textbf{Value:} payload del campo.
     \end{itemize}
 \end{itemize}
-\begin{note}
+\begin{remark}
 Il campo attributes è un \textbf{extensible information field}.
-\end{note}
+\end{remark}
 \begin{definition}[Extensible Information Field]
 Un campo è di tipo extensible information se il numero, il tipo e l'ordine delle informazioni contenute al suo interno può variare in base alle esigenze.
 \end{definition}
@@ -187,7 +187,7 @@ Vediamo nel dettaglio cosa implicano queste debolezze:
 \begin{theorem}[Soluzione con Message Authentication Extension Protocol]
 Più che un protocollo vero e proprio è un container che specifica come un pacchetto di auth dovrebbe essere fatto. 
 Tecnica utile per rendere il protocollo resistente ad attacchi MITM. Il funzionamento prevede l'\textbf{aggiunta} di un \textbf{nuovo attributo} nella Access-Request per il controllo dell'integrità.
-\end{theorem}\pagebreak
+\end{theorem}
 Si hanno così due campi di autenticazione:
 \begin{itemize}
     \item Uno nell'\textbf{header RADIUS}, costituito dalla nonce a 16byte per la richiesta di autenticazione.
@@ -211,7 +211,7 @@ Se la password è più lunga di 16 byte, viene suddivisa in blocchi da 16 e l'ul
 \EndFor
 \end{algorithmic}
 \end{definition}
-\pagebreak
+
 \begin{proposition}[Bassa entropia delle chiavi]
 La bassa entropia è dovuta al basso numero di caratteri coinvolti nelle chiavi (viene usato il set ASCII). Inoltre, in molti casi, \textbf{una sola password è utilizzata per tutta la rete dell'ISP}. Gli attacchi possibili sono due:
 \begin{itemize}
@@ -226,12 +226,12 @@ La bassa entropia è dovuta al basso numero di caratteri coinvolti nelle chiavi 
     Adesso l'attaccante può cifrare una password qualsiasi.
 \end{itemize}
 \end{proposition}
-\begin{note}[Dictionary Attack to Shared Secret Details]\\
+\begin{remark}[Dictionary Attack to Shared Secret Details]
 L'attacco bruteforce è possibile solo con pwd inferiori a 16byte. In particolare, il NAS stesso può essere usato come un oracle in un attacco CPA. Intercettando i messaggi di Access-Request otteniamo la user-password attribute (16 bytes) e il Request Authenticator (16 bytes). Facendo uno xor tra la password cifrata e quella in chiaro otteniamo il digest dell'MD5.
-\end{note}
-\begin{note}[User-PWD Attack Details]\\
+\end{remark}
+\begin{remark}[User-PWD Attack Details]
 Anche questo attacco funziona con password di 16 bytes. Una volta ottenuto il digest valido possiamo bypassare tutte le limitazioni imposte lato client, come il numero di tentativi valido di autenticazione al RADIUS server.
-\end{note}
+\end{remark}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{image/radpwdenc.png}
@@ -249,7 +249,7 @@ Ci sono 3 attacchi possibili che possono essere fatti:
     \[\text{PW1}_{enc}\oplus\text{PW2}_{enc}=(\text{PW1}\oplus\text{MD5(S, ReqAuth)})\oplus(\text{PW2}\oplus\text{MD5(S, ReqAuth)})=\text{PW1}\oplus\text{PW2}\]
     Una volta ottenuto lo xor delle due passowrd in chiaro di due utenti bersaglio, poiché le dimensioni sono note e con buona probabilità di lunghezza differente, otteniamo in chiaro la parte finale della password più lunga e analizzando il risultato è possibile calcolare il risultato. Inoltre, è possibile velocizzare la generazione del dizionario effettuando delle Access-Request con password casuali (magari prese da un db online), consumando generazioni del PRNG.
 \end{itemize}
-\pagebreak
+
 \section{DIAMETER}
 RADIUS al giorno d'oggi è meno utilizzato di una volta in quanto presenta delle limitazioni importanti. In particolare:
 \begin{itemize}
@@ -258,12 +258,12 @@ RADIUS al giorno d'oggi è meno utilizzato di una volta in quanto presenta delle
     \item \textbf{Interoperabilità:} non standardizzata e realizzata tramite soluzioni proprietarie (ogni venditore ha la sua soluzione).
 \end{itemize}
 DIAMETER è un'evoluzione di RADIUS, retrocompatibile e che risolve i le limitazioni analizzate prima. L'ottica con cui è sviluppato è simile alla logica "object-oriented": Viene definita una classe di \textbf{AAA Transport Profile} che specifica il tipo di livello di trasporto da usare (STCP/TCP-based) e una \textbf{base-class} DIAMETER più una serie di classi derivate per svariati tipi di servizi, tutte figlie della base-class.
-\begin{note}
+\begin{remark}
 La DIAMETER Base Protocol è, più che un protocollo AAA, un protocollo di scambio di messaggi. 
-\end{note}
+\end{remark}
 \begin{figure}[h]
     \centering
-    \includegraphics{image/diameter.png}
+    \includegraphics[width=\linewidth]{image/diameter.png}
     \caption{DIAMETER Structure}
     \label{fig:diameter}
 \end{figure}
@@ -271,9 +271,9 @@ La DIAMETER Base Protocol è, più che un protocollo AAA, un protocollo di scamb
 \begin{proposition}[Trasporto Affidabile dei pacchetti]
  Utilizzo di \textbf{STCP/TCP} per il trasferimento affidabile dei pacchetti, instaurando connessioni persistenti tra client e server.
 \end{proposition}
-\begin{note}
+\begin{remark}
     L'affidabilità è fondamentale per avere un accounting efficiente.
-\end{note}
+\end{remark}
 \begin{proposition}[Gestione degli Errori/Guasti standardizzata]
  L'error-control è demandato al livello applicativo. Inoltre, vengono implementate le seguenti funzionalità:
     \begin{itemize}
@@ -281,9 +281,9 @@ La DIAMETER Base Protocol è, più che un protocollo AAA, un protocollo di scamb
         \item \textbf{Watchdog:} periodicamente vengono inviati dei pacchetti per conoscere lo stato dei vicini.
     \end{itemize}
 \end{proposition}
-\begin{note}
+\begin{remark}
     In RADIUS la gestione degli errori dipende dall'implementazione
-\end{note}
+\end{remark}
 \begin{proposition}[Miglior Supporto all'Estensibilità]
 il formato dei pacchetti è \textbf{modificato} e \textbf{ampliato}, per supportare più funzionalità. Tra i servizi implementati troviamo: 
     \begin{itemize}
@@ -305,9 +305,9 @@ Il server può inviare autonomamente dei messaggi al client al fine di supportar
         \item \textbf{Supportare} la \textbf{ri-autenticazione/ri-autorizzazione},
     \end{itemize}
 \end{proposition}
-    \begin{note}
+    \begin{remark}
     RADIUS supporta solo lo schema client-server, dove solo il primo avvia la comunicazione.
-    \end{note}
+    \end{remark}
 \begin{proposition}[Gestione delle Entità Intermedie]
 Viene specificata esplicitamente l'esistenza di diversi tipi di agenti, come \textbf{proxies, redirects, relay}. Inoltre, viene fatta distinzione tra:
     \begin{itemize}
@@ -315,9 +315,9 @@ Viene specificata esplicitamente l'esistenza di diversi tipi di agenti, come \te
         \item \textbf{End-To-End:} comunicazione tra nodi estremi, ovvero tra DIAMETER client e DIAMETER server.
     \end{itemize}
 \end{proposition}
-\begin{note}
+\begin{remark}
     In RADIUS esiste solo hop-by-hop e non vengono specificate entità intermedie.
-\end{note}
+\end{remark}
 \subsection{Pacchetti DIAMETER}
 I pacchetti DIAMETER possiedono il seguente formato:
 \begin{itemize}
@@ -369,14 +369,14 @@ I pacchetti DIAMETER possiedono il seguente formato:
     \includegraphics[width=0.7\textwidth]{image/avpheader.png}
     \caption{AVP Header}
     \label{fig:avpheader}
-\end{figure}\pagebreak
-\begin{note}\textbf{[Mandatory Flag-Bit]}\\
+\end{figure}
+\begin{remark}\textbf{[Mandatory Flag-Bit]}
 Questo flag negli AVP permette di realizzare il cosiddetto \textbf{Incremental Deployment}, ovvero la possibilità di implementare aggiornamenti nel sistema continuando a \textbf{supportare meccanismi preesistenti}. In particolare, per ogni AVP, ovvero per ogni attributo, viene applicata la seguente logica:
 \begin{itemize}
     \item [\textbf{M=1}] il campo AVP è \textbf{necessario} alla funzionalità traspostata nel messaggio Nel caso in cui \textbf{non} venga \textbf{compreso/supportato} dal \textbf{ricevente}, quest'ultmo avvia una \textbf{negoziazione} con il \textbf{mittente} per determinare una configurazione supportata da entrambi.
     \item [\textbf{M=0}] il campo AVP è \textbf{non necessario} alla funzionalità trasportata dal messaggio. Nel caso in cui \textbf{non} venga \textbf{compreso/supportato} dal ricevente, viene silenziosamente \textbf{scartato}.
 \end{itemize}
-\end{note}
+\end{remark}
 \subsection{Agenti Intermedi}
 DIAMETER prevede e supporta i seguenti tipi di \textbf{agenti intermedi}:
 \begin{definition}[Relay Agent]

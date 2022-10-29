@@ -45,7 +45,7 @@ Tuttavia, in WiFi c'è un grosso problema legato alla perdita dei pacchetti dura
 \begin{remark}
 Tanti pacchetti significano tanti inizialization vector: anche usando numeri randomici, con pochi bit abbiamo tanta ripetizione. Usare numeri di sequenza non è praticabile in quanto sarebbe facilmente sincronizzabile.\\
 Se collezionando i pacchetti un attaccante dovesse cominciare a fare uno $xor$ di due messaggi potrebbe risalire alla chiave, risultando sensibile ad attacchi di tipo CPA o KPA \textit{(known plaintext attack)}
-\end{remark}\pagebreak
+\end{remark}
 \subsection{Errori di Confidentiality}
 Riguardo alla confidentiality, i problemi furono principalmente due:
 \begin{enumerate}
@@ -95,7 +95,7 @@ Dal punto 1, capiamo che WEP finisce per implementare un KPA in quanto chiunque 
 Dal punto 2, si può vedere che un MITM in ascolto sul canale, può introdursi nella rete al primo IV che trova riscontro nel dizionario e da quel momento in poi restare autenticato per tutto il tempo che vuole, in quanto sarà sempre lui a decidere quale sarà l'IV da usare.\\
 \begin{remark}
 Una possibile soluzione, sarebbe potuta essere quella di \textbf{inviare l'IV insieme alla challenge}, in modo tale da non lasciare spazio agli utenti.
-\end{remark}\pagebreak
+\end{remark}
 \subsection{Errori di Integrity}
 Esistono diversi algoritmi per garantire l'integrità di un pacchetto. WEP al tempo implementava $CRC-32$, un un algoritmo di error detection che può tener conto dei bit di partenza tramite bit di parità (posti alla fine del messaggio).
 \begin{theorem}

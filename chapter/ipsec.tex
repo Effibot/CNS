@@ -19,7 +19,7 @@ IPSec \textbf{coopera} e \textbf{coesiste} con il protocollo IP, per cui nella \
     \caption{IPSec Architecture}
     \label{fig:ipsecarc}
 \end{figure}
-\pagebreak
+
 \begin{definition}[IPSec Architecture]\label{def:ipsecarc}
 Nel protocollo IPSec distinguiamo le seguenti componenti: (\cref{fig:ipsecarc})
 \begin{itemize}
@@ -35,9 +35,9 @@ Nel protocollo IPSec distinguiamo le seguenti componenti: (\cref{fig:ipsecarc})
     \item Host to Intermediete Router (security Gateway).
     \item Security Gateway to Security Gateway.
 \end{itemize}
-\begin{note}
+\begin{remark}
 Nella SA non c'è trasmissione dati, ma soltanto una serie di azioni per inizializzare parametri di sicurezza.
-\end{note}
+\end{remark}
 \begin{proposition}[SA Setup]\label{prop:sasetup}
 Le SA forniscono dei meccanismi di configurazione di due tipi:
 \begin{itemize}
@@ -98,7 +98,7 @@ Il pacchetto IP protetto da IPsec viene elaborato direttamente dall'host.\\
 \begin{remark}
 Se viene usato AH e l'ip viene cambiato il pacchetto viene scartato.
 \end{remark}
-\end{definition}\pagebreak
+\end{definition}
 \begin{definition}[IPsec Tunnel]\label{def:tunnel}
 Il pacchetto IP protetto da IPsec viene \textbf{incapsulato all'interno di un altro pacchetto IP} dopo aver aggiunto un tag che protegge tutto il pacchetto.\\
 \begin{remark}
@@ -114,11 +114,10 @@ La modalità di lavoro del protocollo viene determinata in base all'esigenza del
 \end{theorem}
 \begin{figure}[h]
     \centering
-    \includegraphics{image/ipsecmode.png}
+    \includegraphics[width=\linewidth]{image/ipsecmode.png}
     \caption{IPsec Mode of Operation}
     \label{fig:my_label}
 \end{figure}
-
 \begin{figure}[h]
 \centering
 \begin{subfigure}{.5\textwidth}
@@ -145,9 +144,9 @@ Viene generato un MAC contenuto nel campo \textbf{ICV (Integrity Check Value)}  
     \item Vengono inclusi per intero l'header \textbf{AH/ESP} ed il \textbf{payload IP}
 \end{itemize}
 \end{theorem}
-\begin{note}
+\begin{remark}
 Al fine di proteggere IPsec da replay attacks sia AH che ESP usano un \textbf{extended sequence number (ESQN)} per numerare i pacchetti.
-\end{note}
+\end{remark}
 \begin{definition}[ESQN]\label{def:esqn}
 Numero complessivamente di 64bit, di cui:
 \begin{itemize}
@@ -172,15 +171,15 @@ Viene usata una \textbf{finestra scorrevole (sliding window)} così fatta:
     \end{itemize}
 \end{itemize}
 
-\end{theorem}\pagebreak
-\begin{note}
+\end{theorem}
+\begin{remark}
 \textbf{E' stato osservato} che il \textbf{traffico prodotto durante la comunicazione} con un determinato server \textbf{possiede una firma statistica} che \textbf{permette di distinguerlo dagli altri} server. In particolare, esaminando le \textbf{proprietà dei pacchetti trasmessi} durante l’inizio di una nuova connessione con il server è possibile \textbf{tracciare} delle \textbf{caratteristiche} come:
 \begin{itemize}
     \item \textbf{Dimensione dei pacchetti} scambiati.
     \item \textbf{Tempo} di  \textbf{inter-arrivo} tra i pacchetti.
     \item \textbf{Presenza} o \textbf{assenza} di determinati tipi di pacchetti.
 \end{itemize}
-\end{note}
+\end{remark}
 Dalle firme statistiche del traffico, un attaccante può \textbf{determinare} con \textbf{quale server} il \textbf{client comunica}, solamente analizzando il traffico generato. \\
 \begin{remark}
 Sarebbe possibile generare dei collegamenti tra \textbf{client} e \textbf{server} che possono essere usati per strutturare attacchi più complessi.
@@ -209,7 +208,7 @@ Il \textbf{protocollo IKEv2 (Internet Key Exchange v2)} permette di creare \text
     \item \textbf{IKE SA:} \textbf{Security Association} \textbf{creata ed utilizzata dal protocollo IKE} per messaggi di controllo. Ne viene \textbf{generata} solamente \textbf{una per istanza IKE}.
     \item \textbf{Child SA:} \textbf{Security Association creata} per \textbf{effettuare} lo \textbf{scambio dati tra i peers utilizzando il protocollo IPsec AH/ESP}. Da un’unica istanza del protocollo IKE possono essere create molteplici Child SA per servire scopi differenti.
 \end{itemize}
-\end{definition}\pagebreak
+\end{definition}
 \subsection{Funzionamento}
 Il protocollo IKE è strutturato in 2 fasi:
 \begin{proposition}
@@ -230,7 +229,7 @@ Il protocollo IKE è strutturato in 2 fasi:
     \caption{IKE 4-way Handshake}
     \label{fig:ikev2}
 \end{figure}
-\pagebreak
+
 I messaggi hanno il seguente formato:
 \begin{definition}[IKE Msg Format]\label{def:ikemsg}
 \begin{itemize}
@@ -242,9 +241,9 @@ Questi messaggi sono trasportati tramite \textbf{UDP}, \textbf{reso affidabile} 
 \end{remark}
 \end{definition}
 \subsection{Key Computation}
-\begin{note}
+\begin{remark}
 Nelle versioni più recenti vengono usate \textbf{solo HKDF} in quanto più sicure. Vediamo però come venivano costruite:
-\end{note}
+\end{remark}
 Le chiavi della \textbf{sessione IKE} vengono generate anche queste con approccio \textit{\textbf{Extract-than-Expand}} \cref{def:ete} tramite delle \textbf{PRF Negoziate} nella fase 1, utilizzando le \textbf{nonces} e i \textbf{dh coefficient} scambiati con i \textbf{messaggi di IKE SA Init}. 
 \begin{definition}[IKE Key Computation]
 \begin{itemize}
@@ -279,12 +278,12 @@ Un attaccante MITM può modificare sia la versione che il version flag all'inter
 \begin{remark}
 SIa l'initiator che il responder possono \textbf{rilevare l'attacco} semplicemente \textbf{verificando} che i \textbf{version flag} sono per \textbf{entrambi} pari a $1$, ovvero, \textbf{nessuno dei due sta utilizzando la propria versione massima}. La versione ottima per la sicurezza è infatti data dalla minima tra le due versioni massime disponibili.
 \end{remark}
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.8\textwidth]{image/ikedown.png}
     \caption{Downgrade Attack and Prevention in IKEv2}
     \label{fig:ikedown}
-\end{figure}\pagebreak
+\end{figure}
 \subsection{Against DoS Attacks}
 Il \textbf{DoS (Denial of Service)} \textbf{attack} utilizza delle \textbf{spoofed IKE SA Init} per \textbf{saturare} le \textbf{capacità computazionali} del \textbf{server} e renderlo \textbf{inaccessibile} agli utenti legittimi. Nel caso del protocollo IKE viene sfruttata l’\textbf{onerosità delle computazioni DH} svolte \textbf{dopo} i primi due \textbf{messaggi} di \textbf{IKE SA Init}.\\
 Il protocollo IKE viene protetto da DoS attack utilizzando un \textbf{Init handshake 4-way} basato sull’uso di \textbf{cookie}. In particolare, vengono inviati i seguenti messaggi
@@ -298,9 +297,9 @@ Il protocollo IKE viene protetto da DoS attack utilizzando un \textbf{Init hands
 \end{enumerate}
 Il server inizia le elaborazioni solamente al termine dell’Init handshake. 
 \end{definition}
-\begin{note}
+\begin{remark}
 Tale schema permette di \textbf{contrastare attacchi DoS basati su IP spoofing} in quanto l’\textbf{attaccante non riceve} il messaggio di \textbf{Response}, indirizzato verso l’indirizzo IP spoofed diverso dal suo, e non quindi può continuare l’handshake.
-\end{note}
+\end{remark}
 \begin{corollary}[Cookie for Handshake 4-way]
 I \textbf{cookie} devono essere stateless: \textbf{casuali, non ripetuti e non predicibili}. Sono possibili due approcci:
 \begin{itemize}
@@ -332,7 +331,7 @@ I \textbf{cookie} devono essere stateless: \textbf{casuali, non ripetuti e non p
   \label{fig:ikedosprev}
 \end{subfigure}
 \end{figure}
-\pagebreak
+
 \section{VPN}
 Una \textbf{Virtual Private Network} è una \textbf{rete virtuale privata} all'interno della rete pubblica che permette di 
 \begin{itemize}

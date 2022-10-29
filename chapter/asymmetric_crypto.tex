@@ -6,7 +6,7 @@ Questi algoritmi sono detti \textbf{a Chiave Asimmetrica}, ovvero algoritmi dove
     \includegraphics{image/asimmcrypto.png}
     \caption{Asymmetric Encryption Base Scheme}
     \label{fig:asymmcrypto}
-\end{figure}\\
+\end{figure}
 C'è un \textbf{importante MA:} gli algoritmi a chiave asimmetrica sono \textbf{computazionalmente onerosi} e non sarebbero praticabili per l'\textbf{intera} sessione di comunicazione cifrata.\\
 C'è bisogno di un approccio \textbf{ibrido}:
 \begin{itemize}
@@ -43,10 +43,10 @@ Il meccanismo di firma digitale \textbf{fornisce} sia\textbf{ message integrity}
     \item \textbf{Se i due digest corrispondono}, il \textbf{messaggio} è \textbf{integro} e \textbf{proviene con certezza dal mittente}.
 \end{itemize}
 \end{proposition}
-\begin{note}
+\begin{remark}
 La funzione \textbf{hash} viene utilizzata\textbf{ senza chiave simmetrica} in quanto \textbf{ha} il solo \textbf{scopo} di \textbf{ridurre la dimensione dell’oggetto da criptare asimmetricamente}, così da rendere il meccanismo efficiente.\\
 Inoltre, il \textbf{destinatario}, ovvero colui che ha necessità di verificare l’integrità del messaggio, \textbf{ha bisogno solamente della chiave pubblica del mittente}, ovvero di nessun segreto condiviso, a differenza del MAC che richiede una chiave simmetrica, ovvero un segreto noto a entrambe le parti.
-\end{note}
+\end{remark}
 \begin{figure}[h]
     \centering
     \includegraphics{image/digitalsign.png}
@@ -60,7 +60,7 @@ E' un concetto di sicurezza dove viene garantita l'integrità del messaggio che 
 
 \section{Key Agreement Algorithms}
 Il problema fondamentale di un meccanismo a chiave asimmetrica è che è necessario sviluppare un modo per condividere le chiavi ed instaurare il processo di \textit{Key Agreement}, ovvero un punto nel protocollo nel quale vengono fissate le chiavi da usare per scambiare i messaggi.\\
-Supponiamo di suddividere la chiave $K$ in due parti $k_1,k_2$, allora il problema di ricostruire la chiave è facile se le due parti sono note, ma è difficile data la chiave capire quali sono le parti che la costituiscono. Gli algoritmi principali di key agreement sono due: RSA e Diffie-Hellman.\\
+Supponiamo di suddividere la chiave $K$ in due parti $k_1,k_2$, allora il problema di ricostruire la chiave è facile se le due parti sono remark, ma è difficile data la chiave capire quali sono le parti che la costituiscono. Gli algoritmi principali di key agreement sono due: RSA e Diffie-Hellman.\\
 Un attaccante che vuole trovare la chiave in un sistema che usa questi algoritmi è di fronte a due problemi:
 \begin{proposition}[Discrete Logarithm Problem in Prime Field]\label{prop:disclog}
 Dati tre \textbf{numeri primi \textsc{GRANDI}} $p,g,x$ \textbf{è facile calcolare}; $y=g^x\mod{p}$.\\
@@ -96,7 +96,7 @@ Vediamo perché calcolare $g^x$ è facile:
 \end{algorithmic}
 \end{algorithm}\\
 La complessità dell'algoritmo è ovviamente $O(log_2(x))=O(n)$ per i quadrati e $O(log_2(x)/2)=O(n/2)$ per le moltiplicazioni, con $n$ numero di bit necessari a costruire l'esponente.\\
-L'algoritmo rappresenta un metodo veloce per calcolare un qualsiasi esponenziale, ma lavorando con il modulo, abbiamo una sovrapposizione notevole di valori per il quale rende difficile il problema del calcolo inverso.\\
+L'algoritmo rappresenta un metodo veloce per calcolare un qualsiasi esponenziale, ma lavorando con il modulo, abbiamo una sovrapposizione remarkvole di valori per il quale rende difficile il problema del calcolo inverso.\\
 Vediamo un esempio grafico del perché è difficile calcolare l'inversa di un esponenziale in modulo, graficando i punti di $y=3^x\mod104729$, con $x\in\{0,3000\}$\\
 Vediamo i due principali algoritmi di key-agreement.
 \begin{figure}[ht]
@@ -106,10 +106,10 @@ Vediamo i due principali algoritmi di key-agreement.
     \label{fig:descretelog}
 \end{figure}
 \section{Diffie Hellman}
-Lo scopo dell'algoritmo è \textbf{esclusivamente} lo scambio di chiavi. L'idea si basa sul calcolo dell'esponenziale in modulo dei numeri primi. Questo permette di rendere arduo il calcolo inverso. L'algoritmo lavora al seguente modo:\pagebreak
+Lo scopo dell'algoritmo è \textbf{esclusivamente} lo scambio di chiavi. L'idea si basa sul calcolo dell'esponenziale in modulo dei numeri primi. Questo permette di rendere arduo il calcolo inverso. L'algoritmo lavora al seguente modo:
 \begin{definition}[(Vanilla) Diffie-Hellman]\label{def:dh}
 Consideriamo due utenti A, che \textbf{genera un rnd} $x$, B che \textbf{genera un rnd} $y$. \textbf{Queste sono le chiavi private degli utenti}.\\
-Assumiamo che vengano precedentemente scambiati i parametri $g,p$\footnote{In realtà $p$ deve avere delle proprietà particolare che vedremo poi}, rispettivamente \textbf{base} dell'esponenziale e \textbf{numero primo GRANDE}.
+Assumiamo che vengano precedentemente scambiati i parametri $g,p$\footnotemark{In realtà $p$ deve avere delle proprietà particolare che vedremo poi}, rispettivamente \textbf{base} dell'esponenziale e \textbf{numero primo GRANDE}.
 \begin{enumerate}
     \item A invia $g^x\mod{p}$
     \item B invia $g^x\mod{p}$
@@ -120,9 +120,9 @@ Adesso i due utenti hanno le chiavi necessarie.
 \end{definition}
 \begin{remark}Nonostante è vero che un attaccante che intercetta i due messaggi non può calcolare $g^{xy}$ con facilità, vedremo che non bisogna \textbf{MAI} usare Diffie-Hellman così come è fatto in quanto un MITM è dietro l'angolo. 
 \end{remark}
-\begin{note}
+\begin{remark}
 DH \textbf{NON SUPPORTA} la firma digitale e lo scambio di messaggi.
-\end{note}
+\end{remark}
 \subsection{Implementazioni di DH}
 L'algoritmo di Key Agreement di DH è stato implementato in tre modi. Nella sua versione \textit{\textbf{Vanilla}} viene detto anche \textbf{Anonymous DH}, perché i valori $x$ e $y$ sono \textbf{generati dinamicamente} ma \textbf{non autenticati}. Tuttavia questo metodo risulta poco sicuro a fronte di attacchi MITM come possiamo vedere in \cref{fig:mitmdh}
 \begin{figure}[ht]
@@ -211,10 +211,10 @@ Consideriamo $2^x\mod{11}=\{2,4,8,5,10,9,7,3,6,1\}$. Poiché $p=11$ è primo, al
     \item \textbf{Approccio alternativo:} Osserviamo che $9=2^6\mod11$ mentre $7=2^7\mod11$. Allora:
     \[9\cdot7\mod11=2^6\cdot2^7\mod11=2^{13}\mod11=2^{10+3}\mod11=1\cdot2^3\mod11=8\]
 \end{itemize}
-\begin{note}
+\begin{remark}
 La conseguenza quindi è che se dobbiamo calcolare l'esponente ad una potenza elevata qualsiasi, possiamo calcolare direttamente $g^{x\mod\Phi(N)}\mod N$, invece di calcolare il vero esponente.
-\end{note}
-\end{example}\pagebreak
+\end{remark}
+\end{example}
 \subsection{RSA Key Transport}
 Vediamo ora come  l'algoritmo costruisce le sue chiavi.
 \begin{definition}[RSA Key Generation]\label{def:rsakey}
@@ -336,9 +336,9 @@ L'attaccante pyuò effettuare il seguente \textbf{CCA}:
     \item Ponendo $r=r\cdot2$ possiamo ripetere il processo e scoprire tutto $M$
 \end{enumerate}
 \end{definition}
-\begin{note}
+\begin{remark}
 Con un bleichenbacher oracle servono al più $log_2(n)$ tentativi per decifrare $M$. con $n=log_2(M)$bits
-\end{note}
+\end{remark}
 \section{Pub-Key Infrastructure}
 Consideriamo uno scenario di key agreement (scambio di chiavi pubbliche e setup di chiavi private comuni per creare un canale sicuro). Fino ad ora non ci siamo preoccupati di verificare la validità della chiave pubblica rilasciata da un utente e l'abbiamo solo usata per decifrare il tag aggiunto al messaggio per ottenere l'hash di $M$ nel caso della firma digitale, oppure per stabilire una chiave comune per la cifratura del canale di comunicazione con RSA. 
 \begin{figure}[ht]
@@ -347,8 +347,8 @@ Consideriamo uno scenario di key agreement (scambio di chiavi pubbliche e setup 
     \caption{RSA Key Transport}
     \label{fig:rsakeytrans}
 \end{figure}
-\begin{note}Se un attaccante rispondesse alla richiesta di un utente di scaricare una chiave pubblica e la sostituisse con la propria, allora ogni messaggio inviato da quel momento in poi dall'attaccante sarebbe considerato valido perché la public key è stata sostituita. 
-\end{note}
+\begin{remark}Se un attaccante rispondesse alla richiesta di un utente di scaricare una chiave pubblica e la sostituisse con la propria, allora ogni messaggio inviato da quel momento in poi dall'attaccante sarebbe considerato valido perché la public key è stata sostituita. 
+\end{remark}
 Vediamo lo schema di un possibile attacco ad RSA:
 \begin{figure}[ht]
     \centering
@@ -362,7 +362,7 @@ Diffie-Hellman non avrebbe comunque protetto da questo tipo di MITM, vedi \cref{
 \begin{proposition}
 Per scambiare le chiavi \textbf{è necessario} legare in \textbf{modo crittografico} la \textbf{chiave pubblica} all'\textbf{identità}.
 \end{proposition}
-Abbiamo bisogno di un'infrastruttura che, oltre a definire lo scambio di chiavi, definisca \textbf{protocolli}, \textbf{strategie} e \textbf{meccanismi} affinché \textbf{lo scambio sia sicuro}\pagebreak
+Abbiamo bisogno di un'infrastruttura che, oltre a definire lo scambio di chiavi, definisca \textbf{protocolli}, \textbf{strategie} e \textbf{meccanismi} affinché \textbf{lo scambio sia sicuro}
 \subsection{Digital Certificate}\label{sssec:digitalcert}
 Un modo per essere sicuri della chiave pubblica rilasciata da un utente è quella di \textbf{fidarsi di un'entità terza}, detta \textbf{Certification Authority}, che garantisce l'integrità del legame che c'è tra la chiave e l'identità.
 \begin{definition}[Certification Authority]\label{def:ca}
@@ -371,9 +371,9 @@ Una CA è una \textbf{Trusted Third Party} a cui altre entità si affidano per r
 \begin{remark}
 Una soluzione più semplice sarebbe quella di fare in modo che tutti conoscano le chiavi pubbliche degli utenti con i quali si vuole comunicare, ma questa soluzione \textbf{non è} ovviamente \textbf{scalabile}.
 \end{remark}
-\begin{note}
+\begin{remark}
 I certificati digitali non risolvono il problema, perché potrebbe esserci un modo di falsificarli.
-\end{note}
+\end{remark}
 Il modo con cui una CA rilascia un certificato è il seguente:
 \begin{proposition}[Emissione di un Certificato]
 Un'entità verifica \textbf{(e.g. offline)}, presso una CA, la sua identità. Vengono svolte le seguenti operazioni:
@@ -406,12 +406,11 @@ Un'entità $A$ vuole accertarsi che il \textbf{certificato} di $B$ sia corretto 
     \end{itemize}
 \end{enumerate}
 \end{definition}
-\begin{note}
+\begin{remark}
 Il metodo chap-like per verificare l'identità dell'entità con cui vogliamo collegarci è \textbf{necessario} per evitare replay attack sul certificato.
-\end{note}
+\end{remark}
 Le CA sono molte e dislocate in tutto il mondo, organizzate poi in una struttura gerarchica. Un'architettura PKI definisce proprio queste relazioni e anche gli standard a cui i certificati devono aderire. Un esempio di certificato è il seguente:
 \begin{example}[ Certificate X.509 (High Level View)]
-\begin{multicols}{2}
 \begin{itemize}
     \item \textbf{Versione Standard:} Indica la versione del certificato.
     \item \textbf{Validità Temporale:} Data di inizio e fine validità.
@@ -422,19 +421,17 @@ Le CA sono molte e dislocate in tutto il mondo, organizzate poi in una struttura
     \item \textbf{Chiave Pubblica Utente:} chiave pubblica dell'utente.
     \item \textbf{Firma Digitale:} firma del certificato generata dalla CA.
 \end{itemize}
-\columnbreak
-\begin{figure}[H]
+\begin{remark}[X.509v3 Extension]
+\textbf{Estensioni:} (se X.509v3) campo addizionale che può contenere diversi tipi di attributi e permette di espandere il certificato con nuove feature.
+\end{remark}
+\end{example}
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.48\textwidth]{image/x509.png}
     \caption{Certificate X.509}
     \label{fig:certx509}
     \vspace{-7pt}
 \end{figure}
-\begin{itemize}
-    \item \textbf{Estensioni:} (se X.509v3) campo addizionale che può contenere diversi tipi di attributi e permette di espandere il certificato con nuove feature.
-\end{itemize}
-\end{multicols}
-\end{example}
 \subsection{Certificate Revocation List}
 Ogni PKI \textit{\textbf{deve}} includere un meccanismo di \textit{revoca} dei certificati, poiché questi possono essere \textbf{compromessi}. Ad esempio: 
 \begin{itemize}
@@ -459,9 +456,9 @@ Possiede il seguente formato:
     \item \textbf{Firma Digitale:} firma generata dalla CA emittente della lista.
 \end{itemize}
 \end{definition}
-\begin{note}
+\begin{remark}
 Ogni entità che utilizza un certificato \textbf{dovrebbe sempre verificarne la validità} controllando la relativa CRL. Tuttavia, questa operazione è demandata ad applicazioni che svolgono un ruolo \textbf{critico} nella rete, per alleggerire il carico complessivo.
-\end{note}
+\end{remark}
 \subsection{Public Key Criptography Standards}
 La PKI specifica molti aspetti legati alla \textbf{crittografica asimmetrica}. Gli standard sono definiti dalle:
 \begin{definition}[PKCS]
@@ -515,9 +512,9 @@ E' un valore booleano, che indica se il l'entità legata a al certificato ha o m
 \begin{remark}
 Permette di individuare un certificato illegittimo nella catena.
 \end{remark}
-\begin{note}
+\begin{remark}
 Una compagnia può avere un cosiddetto \textbf{Wildcard Certificate}. E' un certificato jolly, che permette di certificare tutti i suoi sistemi, con nome diverso, in uno stesso dominio.
-\end{note}\pagebreak
+\end{remark}
 Il meccanismo di certificazione è simile a quello espresso in \cref{def:certval}, ma questa volta c'è almeno un nodo intermedio in più.
 \begin{definition}[Certificate Chain Procedure]\label{def:certchain}
 Supponiamo che A voglia autenticare B. Supponiamo che \textbf{$CA_B$} sia la certificante di B e che $U$ sia la root della catena di certificazione di B ma che sia nella lista delle CA \textbf{universalmente verificate} di A.
@@ -532,9 +529,9 @@ Supponiamo che A voglia autenticare B. Supponiamo che \textbf{$CA_B$} sia la cer
 E poiché \textbf{U è nella sua tabella e universalmente verificata}, B è verificata.
 \end{enumerate}
 \end{definition}
-\begin{note}
+\begin{remark}
 Tipicamente non va sempre così: sono necessari diversi certificati per risalire fino ad una CA effettivamente nella lista di A. In quel caso vengono inviati ad A tutti i certificati intermedi, per poter ricostruire la catena. 
-\end{note}
+\end{remark}
 \subsection{Merkel's Tree}
 Consideriamo per un momento il problema di garantire l'integrità di un file. 
 \begin{proposition}[Best Practices for Integrity]\label{prop:bestpractint}
@@ -545,9 +542,9 @@ Per garantire l'integrità di un file in maniera efficiente occorre provvedere a
     \begin{itemize}
         \item \textbf{Memorizzare} la fingerprint in uno \textbf{spazio di archiviazione sicuro} (una chiavetta, disco rimosso dalla rete ecc).
         \item \textbf{Generare} la \textbf{firma digitale del file} $H(file)_K$.
-        \begin{note}
+        \begin{remark}
             Firmare il file da proteggere o il suo hash è equivalente perché l'hash preserva il contenuto del file da un punto di vista dell'integrità
-        \end{note}
+        \end{remark}
     \end{itemize}
 \end{enumerate}
 \end{proposition}
@@ -621,10 +618,10 @@ Il problema descritto precedentemente può essere formalizzato così:
 Una \textbf{CA intermedia} può generare \textbf{certificati malevoli} visti però come \textbf{validi} dalle entità, \textbf{compromettendo} i \textbf{meccanismi} di \textbf{autenticazione} e \textbf{recupero} delle chiavi pubbliche nella PKI.
 \end{definition}
 La soluzione venne proposta da Google nel 2013 e costituisce una mitigazione del problema, perché in ogni caso c'è una debolezza intrinseca alla base dell'infrastruttura.
-\begin{note}
+\begin{remark}
 Se una delle entità universalmente fidate (es. Governi) dovesse, per qualche motivo, generare certificati malevoli non potremmo accorgerci di niente.
-\end{note}
-L'idea è quella di creare un DB scalabile globalmente distribuito.\pagebreak
+\end{remark}
+L'idea è quella di creare un DB scalabile globalmente distribuito.
 \begin{multicols}{2}
 \begin{definition}[CTDB]
 Le caratteristiche del CTDB sono:
@@ -664,7 +661,7 @@ Prima di utilizzare il certificato di un'entità B, l'entità richiedente A effe
     \item \textbf{Verifica che il certificato sia presente nel CTDB}: ricostruisce il tag root del sottoalbero del Merkle Tree esteso alla quale appartiene il certificato usando i siblings contenuti nel SCT (ricevuto insieme al certificato) e verifica la congruenza con quello presente nel log server.
     \item \textbf{Verifica che il certificato non sia presente in nessuna CRL delle CAs coinvolte.}
 \end{enumerate}
-\end{proposition}\pagebreak
+\end{proposition}
 
 \begin{proposition}[What a CA can do]
 \begin{itemize}
@@ -686,11 +683,11 @@ Il sistema di certificate transparency non è completamente primo di vulnerabili
 \item \textbf{Aggiungere un certificato falso/rubato nel CTDB.} Tuttavia, la CA proprietaria dell’identità rubata si accorgerebe subito del certificato falso inserito nella CTDB e lo aggiunge alla propria CRL.\\
 L’\textbf{attacco} è perciò \textbf{mitigato}, in quanto può \textbf{esistere una finestra temporale} in cui il \textbf{certificato falso è nella CTDB ma non nella CRL}.
 \end{itemize}
-\begin{note}
+\begin{remark}
 La ceritificate transparency è diversa da un sistema a blockchain, sebbene siano entrambe protette da merkle tree. La differenza sta nel fatto che nelle \textbf{blockchain} le \textbf{transazioni} (i chunk) sono \textbf{vere se appartengono alla blockchain}.\\
 Anche se è vero che un certificato viene considerato \textbf{falso} \textbf{se non appartiene} al CTDB, questo \textbf{può} ancora \textbf{essere falso} in quanto potrebbe esser stato \textbf{revocato} da una CA ed \textbf{appartenere} ad una \textbf{CRL}.
-\end{note}
-\pagebreak
+\end{remark}
+
 \section{Authentication with Asymmetric Crypto}
 Nel contesto della \textbf{comunicazione} sicura \textbf{basata sulla crittografia asimmetrica} e i \textbf{certificati digitali}, un’\textbf{entità} \textbf{può autenticarsi} dimostrando di conoscere la \textbf{chiave privata associata alla chiave pubblica} dichiarata all'interno del suo certificato. Esistono 2 diversi approcci:
 \begin{itemize}
